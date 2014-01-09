@@ -1,4 +1,7 @@
 require 'bundler/setup'
+require 'sinatra'
+
+set :bind, '0.0.0.0'
 
 Bundler.require(:default, :development)
 
@@ -17,11 +20,14 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.irregular('lugar', 'lugares')
 end
 
+
 class Usuario
   include Mongoid::Document
+  
   has_many :horarios
   has_and_belongs_to_many :lugares
   has_and_belongs_to_many :materias
+  
   field :nombre
   field :correo
   field :teléfono
@@ -29,9 +35,12 @@ class Usuario
   field :rol
 end
 
+
 class Materia
   include Mongoid::Document
+  
   has_and_belongs_to_many :usuarios
+  
   field :nombre
 end
 
@@ -43,17 +52,23 @@ if Materia.empty?
    end
 end
 
+
 class Horario
   include Mongoid::Document
+  
   belongs_to :usuario
+  
   field :día
-  field :desde, type: Time
-  field :hasta, type: Time
+  field :desde
+  field :hasta
 end
+
 
 class Lugar
   include Mongoid::Document
+  
   has_and_belongs_to_many :usuarios
+  
   field :nombre
 end
   
@@ -66,24 +81,28 @@ if Lugar.empty?
    end
 end
 
-class Clase
-  include Mongoid::Document
-  belongs_to :profesor
-  belongs_to :usuario
-  belongs_to :materia
-end
 
-class Pedido
-  include Mongoid::Document
-  belongs_to :usuario
-end
+#class Clase
+#  include Mongoid::Document
+#  belongs_to :profesor
+#  belongs_to :usuario
+#  belongs_to :materia
+#end
+
+#class Pedido
+#  include Mongoid::Document
+#  belongs_to :usuario
+#end
+
 
 # TODO: Reportar bug Mongoid first_or_create + attr_readonly
 # TODO: push() --> concat()
 # TODO: Que <<() no agregue nil
 # TODO: Completitud de datos antes de avanzar
+# TODO: No renderizar la página si con el correo no encuentra a la persona
 # TODO: Protección de datos
 # TODO: Validación días y horarios
+
 
 ### LOGIN ###
 

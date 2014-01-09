@@ -4,6 +4,8 @@ gem 'sinatra'
 gem 'mongoid'
 gem 'bson_ext'
 gem 'slim'
+gem 'puma'
+gem 'tilt', '~> 1.4.1'
 
 group :development do
   gem 'better_errors'

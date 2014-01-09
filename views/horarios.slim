@@ -1,0 +1,44 @@
+h2 Horarios
+
+- unless @usuario.horarios.empty?
+  table
+    thead
+      tr
+        th Día
+        th Desde
+        th Hasta
+        th
+    tbody
+      - @usuario.horarios.each do |horario|
+        tr
+          td = horario.día
+          td = horario.desde
+          td = horario.hasta
+          td
+            form action="/#{@usuario.correo}/horarios/#{horario.id}" method='POST'
+              input type='hidden' name='_method' value='DELETE'
+              input.btn type='submit' value='Eliminar'
+- else
+  p Agregá al menos un segmento horario. Puede ser en cualquier día de la semana desde las 7:00 hasta las 23:00.
+
+form action='/#{@usuario.correo}/horarios' method='POST'
+
+  label Día
+  select name='horario[día]'
+    option value='Lunes'     Lunes
+    option value='Martes'    Martes
+    option value='Miércoles' Miércoles
+    option value='Jueves'    Jueves
+    option value='Viernes'   Viernes
+    option value='Sábado'    Sábado
+    option value='Domingo'   Domingo
+
+  label Desde
+  input type='time' name='horario[desde]'
+  
+  label Hasta
+  input type='time' name='horario[hasta]'
+
+  br
+  input.btn type='submit' value='Agregar'
+  a.btn href='/#{@usuario.correo}/lugares' Siguiente

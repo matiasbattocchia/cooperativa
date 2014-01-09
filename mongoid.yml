@@ -1,0 +1,13 @@
+development:
+  sessions:
+    default:
+      database: cooperativa_development
+      hosts:
+        - localhost
+
+test:
+  sessions:
+    default:
+      database: cooperativa_test
+      hosts:
+        - localhost

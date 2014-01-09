@@ -1,0 +1,10 @@
+h2 Lugares
+
+form action='/#{@usuario.correo}/lugares' method='POST'
+
+  - @lugares.each do |lugar|
+    input type='checkbox' name='lugares[]' value=lugar.id checked=lugar.usuarios.find(@usuario)
+    label = lugar.nombre
+    br
+
+  input.btn type='submit' value='Siguiente'

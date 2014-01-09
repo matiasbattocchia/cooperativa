@@ -1,0 +1,21 @@
+doctype html
+
+html
+  head
+    title La Cooperativa
+    link href='/css/bootstrap.css' type='text/css' rel='stylesheet'
+    link href='/css/coop.css' type='text/css' rel='stylesheet'
+    link href='/favicon.png' type='image/png' rel='icon'
+
+  body
+    .navbar.navbar-fixed-top
+
+    h1 La Cooperativa
+    p  Clases más baratas, profesores mejores pagos.
+    
+    == yield
+    
+    script src='/js/bootstrap.js' type='text/javascript'
+    script src='/js/jquery.js' type='text/javascript'
+    script src='/js/usig.AutoCompleterFull.min.js' type='text/javascript'
+    script src='/js/coop.js' type='text/javascript'

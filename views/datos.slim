@@ -1,0 +1,27 @@
+h2 Datos personales
+
+form action='/#{@usuario.correo}/datos' method='POST'
+
+  label Nombre
+  input type='text' name='datos[nombre]' value=@usuario.nombre
+  br
+
+  label Dirección
+  input#dirección type='text' name='datos[dirección]' value=@usuario.dirección
+  br
+
+  label Teléfono
+  input type='tel' name='datos[teléfono]' value=@usuario.teléfono
+  br
+
+  label Rol
+  input type='radio' name='datos[rol]' value='Alumno' checked=(@usuario.rol == nil || @usuario.rol == 'Alumno') Alumno
+  br
+
+  input type='radio' name='datos[rol]' value='Profesor' checked=(@usuario.rol == 'Profesor') Profesor
+  br
+
+  input type='radio' name='datos[rol]' value='Administrador' checked=(@usuario.rol == 'Administrador') Administrador
+  br
+
+  input.btn type='submit' value='Siguiente'

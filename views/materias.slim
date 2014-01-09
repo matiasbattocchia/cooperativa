@@ -1,0 +1,10 @@
+h2 Materias
+
+form action='/#{@usuario.correo}/materias' method='POST'
+
+  - @materias.each do |materia|
+    input type='checkbox' name='materias[]' value=materia.id checked=materia.usuarios.find(@usuario)
+    label = materia.nombre
+    br
+
+  input.btn type='submit' value='Siguiente'

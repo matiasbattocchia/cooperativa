@@ -3,8 +3,14 @@ h2 Lugares
 form action='/#{@usuario.correo}/lugares' method='POST'
 
   - @lugares.each do |lugar|
-    input type='checkbox' name='lugares[]' value=lugar.id checked=lugar.usuarios.find(@usuario)
-    label = lugar.nombre
+    input type='checkbox' name='lugares[]' value=lugar.id checked=lugar.usuarios.find(@usuario) = lugar.nombre
     br
 
+  p Marcá tu barrio más los barrios a los que estés
+    dispuesto a visitar.
+
+  - @localidades.each do |localidad|
+    input type='checkbox' name='localidades[]' value=localidad.id checked=localidad.usuarios.find(@usuario) = localidad.nombre
+
+  br
   input.btn type='submit' value='Siguiente'

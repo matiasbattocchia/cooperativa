@@ -7,7 +7,11 @@ form action='/#{@usuario.correo}/datos' method='POST'
   br
 
   label Dirección
-  input#dirección type='text' name='datos[dirección]' value=@usuario.dirección
+  input type='text' name='datos[provincia]' value=@usuario.dirección
+  br
+  input#dirección type='text' name='datos[localidad]' value=@usuario.dirección
+  br
+  input#dirección type='text' name='datos[localidad]' value=@usuario.dirección
   br
 
   label Teléfono

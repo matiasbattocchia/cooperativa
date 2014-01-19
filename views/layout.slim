@@ -9,13 +9,23 @@ html
 
   body
     .container
-      .row
-        .col-md-12
-          h1 La Cooperativa
-          p  Clases más baratas, profesores mejores pagos.
-    
+      h1 La Cooperativa
+      p  Clases más baratas, profesores mejores pagos.
+
+      ul.nav.nav-pills.nav-stacked
+        li
+          a href="/#{params[:correo]}/materias" Materias
+        li
+          a href="/#{params[:correo]}/lugares" Lugares
+        li
+          a href="/#{params[:correo]}/horarios" Horarios
+        li
+          a href="/#{params[:correo]}/preferencias" Preferencias
+        li
+          a href="/#{params[:correo]}/datos" Datos
+
       == yield
-    
+
     script src='/js/jquery.js' type='text/javascript'
     script src='/js/bootstrap.js' type='text/javascript'
     //script src='//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js'

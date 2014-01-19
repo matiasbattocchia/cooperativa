@@ -23,27 +23,34 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.irregular('horario', 'horarios')
   inflect.irregular('localidad', 'localidades')
   inflect.irregular('dirección', 'direcciones')
+  inflect.irregular('lugar', 'lugares')
+  inflect.irregular('lugar_precargado', 'lugares_precargados')
 end
 
 
 class Usuario
   include Mongoid::Document
-  
+
   has_many :horarios
-  has_many :direcciones
-  has_and_belongs_to_many :preferencias
+  has_many :lugares
+  has_and_belongs_to_many :localidades
   has_and_belongs_to_many :materias
-  
+
   field :nombre
   field :correo
   field :teléfono
 
   field :rol
 
-  field :institución
-  field :carrera
-  field :sede
+  field :clases_a_domicilio?, type: Boolean
+  field :clases_en_lugar_público?, type: Boolean
+  field :clases_en_domicilio?, type: Boolean
+
+  # field :institución
+  # field :carrera
+  # field :sede
 end
+
 
 class Materia
   include Mongoid::Document
@@ -80,36 +87,34 @@ class Horario
   include Mongoid::Document
   
   belongs_to :usuario
-  belongs_to :dirección_desde, class_name: 'Dirección', inverse_of: nil
-  belongs_to :dirección_hasta, class_name: 'Dirección', inverse_of: nil
+  belongs_to :lugar_desde, class_name: 'Lugar', inverse_of: nil
+  belongs_to :lugar_hasta, class_name: 'Lugar', inverse_of: nil
   
   field :día
-  field :desde
-  field :hasta
+  field :hora_desde
+  field :hora_hasta
+
+  field :clase_en_lugar_desde?, type: Boolean
+  field :clase_en_lugar_hasta?, type: Boolean
+
+  Días = [
+    'Lunes',
+    'Martes',
+    'Miércoles',
+    'Jueves',
+    'Viernes',
+    'Sábado',
+    'Domingo'
+  ]
 end
 
-
-class Preferencia
-  include Mongoid::Document
-  
-  has_and_belongs_to_many :usuarios
-  
-  field :nombre
-end
-
-if Preferencia.empty?
-  ['Institución',
-   'Casa alumno',
-   'Casa profesor',
-   'Lugar público'].each do |lugar|
-     Preferencia.create(nombre: lugar)
-   end
-end
 
 class Localidad
   include Mongoid::Document
 
-  has_many :direcciones
+  has_many :lugares
+  has_many :lugares_precargados
+  has_and_belongs_to_many :usuarios
 
   field :barrio
   field :comuna
@@ -117,21 +122,38 @@ class Localidad
   field :nivel_2
   field :zona
   field :nivel_1
+
+  def datos
+    barrio ? barrio : localidad
+  end
 end
 
-class Dirección
+
+class Lugar
   include Mongoid::Document
 
   belongs_to :localidad
   belongs_to :usuario
 
+  field :establecimiento
   field :calle
   field :altura
-  field :adicional
+  field :departamento
 
   field :longitud, type: Float
   field :latitud, type: Float
-  field :estado
+
+  field :público?, type: Boolean
+
+  def datos
+    if not establecimiento.empty?
+      establecimiento
+    elsif not (calle.empty? || altura.empty?)
+      calle + ' ' + altura
+    else
+      localidad.barrio || localidad.localidad
+    end
+  end
 end
 
 localidades = [
@@ -205,6 +227,43 @@ if Localidad.empty?
     Localidad.create localidad
   end
 end
+
+
+class LugarPrecargado
+  include Mongoid::Document
+
+  belongs_to :localidad
+
+  field :establecimiento
+  field :calle
+  field :altura
+  field :departamento
+
+  field :longitud, type: Float
+  field :latitud, type: Float
+
+  field :público?, type: Boolean
+end
+
+lugares_precargados = [
+  {localidad:
+     {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '2',  barrio: 'Recoleta'},
+   lugar:
+     {establecimiento: 'Ciudad Universitaria', calle: nil, altura: nil, departamento: nil, longitud: -58.123, latitud: -38.123, público?: true}
+  },
+  {localidad:
+     {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '13', barrio: 'Núñez'},
+   lugar:
+     {establecimiento: 'Facultad de Ciencias Sociales (UBA)', calle: 'Manso', altura: '123', departamento: nil, longitud: -58.123, latitud: -38.123, público?: true}
+  }
+]
+
+if LugarPrecargado.empty?
+  lugares_precargados.each do |lugar_precargado|
+    Localidad.find_by(lugar_precargado[:localidad]).lugares_precargados << LugarPrecargado.new(lugar_precargado[:lugar])
+  end
+end
+
 
 # class Clase
 #   include Mongoid::Document
@@ -283,22 +342,23 @@ post '/:correo/materias' do
 end
 
 
-### DIRECCIONES ###
+### LUGARES ###
 
 get '/:correo/lugares' do
   @usuario = Usuario.find_by(correo: params[:correo])
 
-  slim :direcciones
+  slim :lugares
 end
 
 
 post '/:correo/lugares' do
+
   @usuario = Usuario.find_by(correo: params[:correo])
 
   if localidad = Localidad.find_by(params[:localidad])
-    localidad.direcciones << dirección = Dirección.new(params[:dirección])
+    localidad.lugares << lugar = Lugar.new(params[:lugar])
 
-    query = "address=#{dirección.altura} #{dirección.calle},#{localidad.localidad},#{localidad.nivel_2 + ',' if localidad.nivel_2}#{localidad.nivel_1}&sensor=false".gsub(' ', '+')
+    query = "address=#{lugar.establecimiento},#{lugar.altura} #{lugar.calle},#{localidad.barrio},#{localidad.localidad},#{localidad.nivel_2},#{localidad.nivel_1}&sensor=false".gsub(' ', '+')
 
     url = 'maps.googleapis.com'
     urn = '/maps/api/geocode/json?' + query
@@ -308,13 +368,11 @@ post '/:correo/lugares' do
     if respuesta['status'] == 'OK'
       coordenadas = respuesta["results"].first["geometry"]["location"]
 
-      dirección.latitud  = coordenadas['lat']
-      dirección.longitud = coordenadas['lng']
+      lugar.latitud  = coordenadas['lat']
+      lugar.longitud = coordenadas['lng']
     end
 
-    dirección.estado = respuesta['status']
-
-    @usuario.direcciones << dirección
+    @usuario.lugares << lugar
   end
 
   redirect to "/#{@usuario.correo}/lugares"
@@ -324,7 +382,7 @@ end
 delete '/:correo/lugares/:id' do
   @usuario = Usuario.find_by(correo: params[:correo])
 
-  @usuario.direcciones.find(params[:id]).delete
+  @usuario.lugares.find(params[:id]).delete
 
   redirect to "/#{@usuario.correo}/lugares"
 end
@@ -357,32 +415,30 @@ delete '/:correo/horarios/:id' do
 end
 
 
-### LUGARES ###
+### PREFERENCIAS ###
 
-get '/:correo/lugares' do
+get '/:correo/preferencias' do
   @usuario = Usuario.find_by(correo: params[:correo])
 
-  @lugares = Lugar.all.asc(:nombre)
-  @localidades = Localidad.all.asc(:nombre)
-
-  slim :lugares
+  slim :preferencias
 end
 
 
-post '/:correo/lugares' do
+post '/:correo/preferencias' do
+  @usuario = Usuario.find_by(correo: params[:correo])
+
+  @usuario.localidades << Localidad.find_by(params[:localidad])
+
+  redirect to "/#{@usuario.correo}/preferencias"
+end
+
+
+delete '/:correo/preferencias/:id' do
   @usuario = Usuario.find_by(correo: params[:correo])
   
-  @usuario.lugares = []
+  @usuario.localidades.find(params[:id]).delete
 
-  params[:lugares].each do |lugar|
-    @usuario.lugares << Lugar.find(lugar)
-  end
-  
-  params[:localidades].each do |localidad|
-    @usuario.localidades << Localidad.find(localidad)
-  end
-
-  redirect to "/#{@usuario.correo}/datos"
+  redirect to "/#{@usuario.correo}/preferencias"
 end
 
 

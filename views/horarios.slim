@@ -1,59 +1,55 @@
-.row
-  .col-md-12
-    h2 Horarios
+h2 Horarios
 
-.row
-  .col-md-6
-    - unless @usuario.horarios.empty?
-      table.table-striped
-        thead
-          tr
-            th Día
-            th Desde
-            th
-            th Hasta
-            th
-            th
-        tbody
-          - @usuario.horarios.each do |horario|
-            tr
-              td = horario.día
-              td = horario.desde
-              td = horario.dirección_desde.nombre
-              td = horario.hasta
-              td = horario.dirección_hasta.nombre
-              td
-                form action="/#{@usuario.correo}/horarios/#{horario.id}" method='POST'
-                  input type='hidden' name='_method' value='DELETE'
-                  input.btn-link type='submit' value='Eliminar'
-    - else
-      p Agregá al menos un segmento horario. Puede ser en cualquier día de la semana desde las 7:00 hasta las 23:00.
+- unless @usuario.horarios.empty?
+  table.table-striped
+    thead
+      tr
+        th Día
+        th Desde
+        th
+        th
+        th Hasta
+        th
+        th
+        th
+    tbody
+      - @usuario.horarios.each do |horario|
+        tr
+          td = horario.día
+          td = horario.hora_desde
+          td = horario.lugar_desde.datos
+          td = horario.clase_en_lugar_desde? ? 'Sí' : 'No'
+          td = horario.hora_hasta
+          td = horario.lugar_hasta.datos
+          td = horario.clase_en_lugar_hasta? ? 'Sí' : 'No'
+          td
+            form action="/#{@usuario.correo}/horarios/#{horario.id}" method='POST'
+              input type='hidden' name='_method' value='DELETE'
+              input.btn-link type='submit' value='Eliminar'
+- else
+  p Agregá al menos un segmento horario. Puede ser en cualquier día de la semana desde las 7:00 hasta las 23:00.
 
-  .col-md-6
-    form.form-horizontal action='/#{@usuario.correo}/horarios' method='POST'
+form.form-horizontal action='/#{@usuario.correo}/horarios' method='POST'
 
-      label Día
-      select name='horario[día]'
-        option value='Lunes'     Lunes
-        option value='Martes'    Martes
-        option value='Miércoles' Miércoles
-        option value='Jueves'    Jueves
-        option value='Viernes'   Viernes
-        option value='Sábado'    Sábado
-        option value='Domingo'   Domingo
+  label Día
+  select name='horario[día]'
+    - Horario::Días.each do |día|
+      option value=día = día
 
-      label Desde
-      input type='time' name='horario[desde]'
-      select name='horario[dirección_desde]'
-        - @usuario.direcciones.asc.each do |dirección|
-          option value=dirección.id = dirección.nombre
+  label Desde
+  input type='time' name='horario[hora_desde]'
+  select name='horario[lugar_desde]'
+    - @usuario.lugares.asc.each do |lugar|
+      option value=lugar.id = lugar.datos
+  input type='checkbox' name='horario[clase_en_lugar_desde?]' checked=true value='true' Clase
 
-      label Hasta
-      input type='time' name='horario[hasta]'
-      select name='horario[dirección_hasta]'
-        - @usuario.direcciones.asc.each do |dirección|
-          option value=dirección.id = dirección.nombre
+  label Hasta
+  input type='time' name='horario[hora_hasta]'
+  select name='horario[lugar_hasta]'
+    - @usuario.lugares.asc.each do |lugar|
+      option value=lugar.id = lugar.datos
+  input type='checkbox' name='horario[clase_en_lugar_hasta?]' checked=true value='true' Clase
 
-      br
-      input.btn type='submit' value='Agregar'
-      a.btn href='/#{@usuario.correo}/datos' Siguiente
+  br
+  input.btn type='submit' value='Agregar'
+  a.btn href='/#{@usuario.correo}/preferencias' Siguiente

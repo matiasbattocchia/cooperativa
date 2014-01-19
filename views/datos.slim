@@ -5,20 +5,17 @@ form action='/#{@usuario.correo}/datos' method='POST'
   label Nombre
   input type='text' name='datos[nombre]' value=@usuario.nombre
   br
-
-  label Dirección
-  input type='text' name='datos[provincia]' value=@usuario.dirección
-  br
-  input#dirección type='text' name='datos[localidad]' value=@usuario.dirección
-  br
-  input#dirección type='text' name='datos[localidad]' value=@usuario.dirección
+  
+  label Correo
+  input type='text' name='datos[correo]' value=@usuario.correo
   br
 
   label Teléfono
   input type='tel' name='datos[teléfono]' value=@usuario.teléfono
   br
 
-  label Rol
+  h3 Rol
+
   input type='radio' name='datos[rol]' value='Alumno' checked=(@usuario.rol == nil || @usuario.rol == 'Alumno') Alumno
   br
 
@@ -26,6 +23,17 @@ form action='/#{@usuario.correo}/datos' method='POST'
   br
 
   input type='radio' name='datos[rol]' value='Administrador' checked=(@usuario.rol == 'Administrador') Administrador
+  br
+  
+  h3 Modalidad
+
+  input type='checkbox' name='datos[clases_a_domicilio?]' value='true' checked=@usuario.clases_a_domicilio? A domicilio
+  br
+
+  input type='checkbox' name='datos[clases_en_lugar_público?]' value='true' checked=@usuario.clases_en_lugar_público? Lugar público
+  br
+
+  input type='checkbox' name='datos[clases_en_domicilio?]' value='true' checked=@usuario.clases_en_domicilio? En domicilio
   br
 
   input.btn type='submit' value='Siguiente'

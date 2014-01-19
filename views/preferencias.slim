@@ -1,0 +1,26 @@
+h2 Limitar búsqueda (opcional)
+
+- unless @usuario.localidades.empty?
+  table.table-striped
+    thead
+      tr
+        th
+        th
+    tbody
+      - @usuario.localidades.each do |localidad|
+        tr
+          td = localidad.datos
+          td
+            form action="/#{@usuario.correo}/preferencias/#{localidad.id}" method='POST'
+              input type='hidden' name='_method' value='DELETE'
+              input.btn-link type='submit' value='Eliminar'
+- else
+  p Agregá localidades para limitar la búsqueda.
+
+form action='/#{@usuario.correo}/preferencias' method='POST'
+
+  == slim :localidades
+
+  br
+  input.btn type='submit' value='Agregar'
+  a.btn href='/#{@usuario.correo}/datos' Siguiente

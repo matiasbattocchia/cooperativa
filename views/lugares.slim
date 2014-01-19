@@ -1,16 +1,43 @@
 h2 Lugares
 
-form action='/#{@usuario.correo}/lugares' method='POST'
+- unless @usuario.lugares.empty?
+  table.table-striped
+    thead
+      tr
+        th
+        th
+        th
+    tbody
+      - @usuario.lugares.each do |lugar|
+        tr
+          td.mapa style='width: 140px; height: 140px' data-latitud=lugar.latitud data-longitud=lugar.longitud
+          td = lugar.datos
+          td
+            form action="/#{@usuario.correo}/lugares/#{lugar.id}" method='POST'
+              input type='hidden' name='_method' value='DELETE'
+              input.btn-link type='submit' value='Eliminar'
+- else
+  p Agregá al menos un lugar.
 
-  - @lugares.each do |lugar|
-    input type='checkbox' name='lugares[]' value=lugar.id checked=lugar.usuarios.find(@usuario) = lugar.nombre
-    br
+form.form-horizontal action='/#{@usuario.correo}/lugares' method='POST'
 
-  p Marcá tu barrio más los barrios a los que estés
-    dispuesto a visitar.
+  == slim :localidades
 
-  - @localidades.each do |localidad|
-    input type='checkbox' name='localidades[]' value=localidad.id checked=localidad.usuarios.find(@usuario) = localidad.nombre
+  label Calle
+  input type='text' name='lugar[calle]'
+
+  label Altura
+  input type='text' name='lugar[altura]'
+
+  label Departamento
+  input type='text' name='lugar[departamento]'
+
+  label Establecimiento
+  input type='text' name='lugar[establecimiento]'
 
   br
-  input.btn type='submit' value='Siguiente'
+  input type='checkbox' name='lugar[público?]' value=true Es un lugar público
+
+  br
+  input.btn type='submit' value='Agregar'
+  a.btn href='/#{@usuario.correo}/horarios' Siguiente

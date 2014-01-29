@@ -21,9 +21,6 @@ form action='/#{@usuario.correo}/datos' method='POST'
 
   input type='radio' name='datos[rol]' value='Profesor' checked=(@usuario.rol == 'Profesor') Profesor
   br
-
-  input type='radio' name='datos[rol]' value='Administrador' checked=(@usuario.rol == 'Administrador') Administrador
-  br
   
   h3 Modalidad
 
@@ -36,4 +33,9 @@ form action='/#{@usuario.correo}/datos' method='POST'
   input type='checkbox' name='datos[clases_en_domicilio?]' value='true' checked=@usuario.clases_en_domicilio? En domicilio
   br
 
-  input.btn type='submit' value='Siguiente'
+  - if @usuario.estado == 'Habilitado'
+    input.btn.btn-danger type='submit' name='estado' value='Deshabilitar'
+  - else
+    input.btn.btn-success type='submit' name='estado' value='Habilitar'
+
+  input.btn type='submit' value='Finalizar'

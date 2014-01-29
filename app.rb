@@ -25,6 +25,7 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.irregular('dirección', 'direcciones')
   inflect.irregular('lugar', 'lugares')
   inflect.irregular('lugar_precargado', 'lugares_precargados')
+  inflect.irregular('lugarprecargado', 'lugaresprecargados')
 end
 
 
@@ -45,6 +46,8 @@ class Usuario
   field :clases_a_domicilio?, type: Boolean
   field :clases_en_lugar_público?, type: Boolean
   field :clases_en_domicilio?, type: Boolean
+
+  field :estado, default: 'Deshabilitado'
 
   # field :institución
   # field :carrera
@@ -222,12 +225,6 @@ localidades = [
   {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'San Isidro', localidad: 'Béccar'},
 ]
 
-if Localidad.empty?
-  localidades.each do |localidad|
-    Localidad.create localidad
-  end
-end
-
 
 class LugarPrecargado
   include Mongoid::Document
@@ -245,6 +242,14 @@ class LugarPrecargado
   field :público?, type: Boolean
 end
 
+
+if Localidad.empty?
+  localidades.each do |localidad|
+    Localidad.create localidad
+  end
+end
+
+
 lugares_precargados = [
   {localidad:
      {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '2',  barrio: 'Recoleta'},
@@ -257,6 +262,7 @@ lugares_precargados = [
      {establecimiento: 'Facultad de Ciencias Sociales (UBA)', calle: 'Manso', altura: '123', departamento: nil, longitud: -58.123, latitud: -38.123, público?: true}
   }
 ]
+
 
 if LugarPrecargado.empty?
   lugares_precargados.each do |lugar_precargado|
@@ -285,7 +291,9 @@ end
 # TODO: No renderizar la página si con el correo no encuentra a la persona
 # TODO: Protección de datos
 # TODO: Validación días y horarios
-# TODO: Dos .change() se referían a la misma función y uno bloqueaba al otro.
+# TODO: Unión de segmentos horarios que se solapan.
+# TODO: Client-side geocoding.
+# TODO: JS: Dos .change() se referían a la misma función y uno bloqueaba al otro.
 
 
 get '/localidades' do
@@ -302,6 +310,45 @@ helpers do
   end
 end
 
+
+### Alumnos y Profesores ###
+
+get '/profesores' do
+  @profesores = Usuario.where(rol: 'Profesor')
+
+  slim :lista
+end
+
+
+get '/:correo/búsqueda' do
+  @alumno = Usuario.find_by(correo: params[:correo])
+
+  # horarios
+  # preferencias de localidad si hay
+
+
+  modalidades = []
+  modalidades << {clases_en_domicilio?: true} if @alumno.clases_a_domicilio?
+  modalidades << {clases_a_domicilio?: true} if @alumno.clases_en_domicilio?
+  modalidades << {clases_en_lugar_público?: true} if @alumno.clases_en_lugar_público?
+
+
+  @profesores = Usuario.where(rol: 'Profesor').in(materia_ids: @alumno.materia_ids).or(*modalidades)
+
+  @profesores.each do |profesor|
+    profesor.horarios.each do |horario_profesor|
+      @alumno.horarios.each do |horario_alumno|
+        if horario_profesor.día == horario_alumno.día
+          hora_desde = horario_profesor.desde <= horario_alumno.desde ? horario_alumno.desde : horario_profesor.desde
+          hora_hasta = horario_profesor.hasta <= horario_alumno.hasta ? horario_profesor.hasta : horario_alumno.hasta
+          profesores << {profesor: profesor.id, día: profesor.día, desde: hora_desde, hasta: hora_hasta} if hora_hasta - hora_desde >= '1:30'
+        end
+      end
+    end
+  end
+
+  slim :lista
+end
 
 ### LOGIN ###
 
@@ -456,5 +503,14 @@ post '/:correo/datos' do
 
   @usuario.update_attributes(params[:datos])
 
-  redirect to '/'
+  if params[:estado]
+    case params[:estado]
+    when 'Habilitar' then @usuario.estado = 'Habilitado'
+    when 'Deshabilitar' then @usuario.estado = 'Deshabilitado'
+    end
+    @usuario.save
+    redirect to "/#{@usuario.correo}/datos"
+  else
+    redirect to '/'
+  end
 end

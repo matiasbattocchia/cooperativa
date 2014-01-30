@@ -319,6 +319,18 @@ get '/profesores' do
   slim :lista
 end
 
+get '/alumnos' do
+  @profesores = Usuario.where(rol: 'Alumno')
+
+  slim :lista
+end
+
+class String
+  def en_minutos
+    horas, minutos = self.split(':')
+    horas.to_i * 60 + minutos.to_i
+  end
+end
 
 get '/:correo/búsqueda' do
   @alumno = Usuario.find_by(correo: params[:correo])
@@ -326,28 +338,44 @@ get '/:correo/búsqueda' do
   # horarios
   # preferencias de localidad si hay
 
+  # modalidades = []
+  # modalidades << {clases_en_domicilio?: true} if @alumno.clases_a_domicilio?
+  # modalidades << {clases_a_domicilio?: true} if @alumno.clases_en_domicilio?
+  # modalidades << {clases_en_lugar_público?: true} if @alumno.clases_en_lugar_público?
 
-  modalidades = []
-  modalidades << {clases_en_domicilio?: true} if @alumno.clases_a_domicilio?
-  modalidades << {clases_a_domicilio?: true} if @alumno.clases_en_domicilio?
-  modalidades << {clases_en_lugar_público?: true} if @alumno.clases_en_lugar_público?
+  @profesores = Usuario.where(rol: 'Profesor', estado: 'Habilitado', clases_a_domicilio?: true).in(materia_ids: @alumno.materia_ids)
 
-
-  @profesores = Usuario.where(rol: 'Profesor').in(materia_ids: @alumno.materia_ids).or(*modalidades)
+  @profes = Hash.new { |h,k| h[k]=[] }
 
   @profesores.each do |profesor|
     profesor.horarios.each do |horario_profesor|
       @alumno.horarios.each do |horario_alumno|
-        if horario_profesor.día == horario_alumno.día
-          hora_desde = horario_profesor.desde <= horario_alumno.desde ? horario_alumno.desde : horario_profesor.desde
-          hora_hasta = horario_profesor.hasta <= horario_alumno.hasta ? horario_profesor.hasta : horario_alumno.hasta
-          profesores << {profesor: profesor.id, día: profesor.día, desde: hora_desde, hasta: hora_hasta} if hora_hasta - hora_desde >= '1:30'
+        if (día = horario_profesor.día) == horario_alumno.día
+          hora_desde =
+            horario_profesor.hora_desde.en_minutos <=
+              horario_alumno.hora_desde.en_minutos ?
+                horario_alumno.hora_desde : horario_profesor.hora_desde
+          
+          hora_hasta =
+            horario_profesor.hora_hasta.en_minutos <=
+              horario_alumno.hora_hasta.en_minutos ?
+                horario_profesor.hora_hasta : horario_alumno.hora_hasta
+          
+          if hora_hasta.en_minutos - hora_desde.en_minutos >= '1:30'.en_minutos
+            
+            pld = horario_profesor.lugar_desde
+            plh = horario_profesor.lugar_hasta
+
+
+            @profes[profesor.id] << {día: día, desde: hora_desde, hasta: hora_hasta, horario_profesor: horario_profesor.id, horario_alumno: horario_alumno.id}
+        
+          end
         end
       end
     end
   end
 
-  slim :lista
+  slim :búsqueda
 end
 
 ### LOGIN ###

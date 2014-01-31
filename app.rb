@@ -1,5 +1,6 @@
 require 'bundler/setup'
 require 'sinatra'
+require 'haversine'
 require 'net/http'
 
 set :bind, '0.0.0.0'
@@ -332,6 +333,12 @@ class String
   end
 end
 
+class Integer
+  def en_horas
+    (self / 60).to_s + ':' + (self % 60).to_s
+  end
+end
+
 get '/:correo/búsqueda' do
   @alumno = Usuario.find_by(correo: params[:correo])
 
@@ -361,13 +368,18 @@ get '/:correo/búsqueda' do
               horario_alumno.hora_hasta.en_minutos ?
                 horario_profesor.hora_hasta : horario_alumno.hora_hasta
           
-          if hora_hasta.en_minutos - hora_desde.en_minutos >= '1:30'.en_minutos
+          if (tiempo = hora_hasta.en_minutos - hora_desde.en_minutos) >= '1:30'.en_minutos
             
             pld = horario_profesor.lugar_desde
             plh = horario_profesor.lugar_hasta
 
+            ald = horario_alumno.lugar_desde
+            alh = horario_alumno.lugar_hasta
 
-            @profes[profesor.id] << {día: día, desde: hora_desde, hasta: hora_hasta, horario_profesor: horario_profesor.id, horario_alumno: horario_alumno.id}
+            distancia = Haversine.distance(pld.latitud, pld.longitud, ald.latitud, ald.longitud)
+
+
+            @profes[profesor.id] << {día: día, desde: hora_desde, hasta: hora_hasta, horario_profesor: horario_profesor.id, horario_alumno: horario_alumno.id, distancia: distancia, tiempo: tiempo}
         
           end
         end
@@ -375,7 +387,7 @@ get '/:correo/búsqueda' do
     end
   end
 
-  slim :búsqueda
+  slim :búsqueda, layout: false
 end
 
 ### LOGIN ###

@@ -8,6 +8,7 @@ gem 'tilt', '~> 1.4.1'
 gem 'json'
 gem 'activesupport', '~> 3.2.0'
 gem 'mongoid', '~> 3.1.2'
+gem 'haversine_distance'
 
 group :development do
   gem 'better_errors'

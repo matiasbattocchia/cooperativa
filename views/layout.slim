@@ -4,7 +4,7 @@ html
   head
     title La Cooperativa
     link href='/css/bootstrap.css' type='text/css' rel='stylesheet'
-    //link href='/css/coop.css' type='text/css' rel='stylesheet'
+    link href='/css/coop.css' type='text/css' rel='stylesheet'
     link href='/favicon.png' type='image/png' rel='icon'
 
   body
@@ -12,15 +12,11 @@ html
       h1 La Cooperativa
       p  Clases más baratas, profesores mejores pagos.
 
-      ul.nav.nav-pills.nav-stacked
+      ul.nav.nav-pills
         li
           a href="/#{params[:correo]}/materias" Materias
         li
-          a href="/#{params[:correo]}/lugares" Lugares
-        li
-          a href="/#{params[:correo]}/horarios" Horarios
-        li
-          a href="/#{params[:correo]}/preferencias" Preferencias
+          a href="/#{params[:correo]}/lugares" Lugares y Horarios
         li
           a href="/#{params[:correo]}/datos" Datos
 

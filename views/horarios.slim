@@ -1,27 +1,20 @@
-h2 Horarios
+h2 = 'Horarios para ' + @lugar.nombre
 
-- unless @usuario.horarios.empty?
+- unless @horarios.empty?
   table.table-striped
     thead
       tr
         th Día
         th Desde
-        th
-        th
         th Hasta
         th
-        th
-        th
     tbody
-      - @usuario.horarios.each do |horario|
+      - @horarios.each do |horario|
         tr
+          td = horario.modalidad
           td = horario.día
-          td = horario.hora_desde
-          td = horario.lugar_desde.datos
-          td = horario.clase_en_lugar_desde? ? 'Sí' : 'No'
-          td = horario.hora_hasta
-          td = horario.lugar_hasta.datos
-          td = horario.clase_en_lugar_hasta? ? 'Sí' : 'No'
+          td = horario.desde
+          td = horario.hasta
           td
             form action="/#{@usuario.correo}/horarios/#{horario.id}" method='POST'
               input type='hidden' name='_method' value='DELETE'
@@ -31,25 +24,22 @@ h2 Horarios
 
 form.form-horizontal action='/#{@usuario.correo}/horarios' method='POST'
 
+  label Modalidad
+  input type='radio' name='horario[modalidad]' value='A domicilio' Desde este lugar
+  br
+  input type='radio' name='horario[modalidad]' value='En domicilio' En este lugar
+
   label Día
   select name='horario[día]'
     - Horario::Días.each do |día|
       option value=día = día
 
   label Desde
-  input type='time' name='horario[hora_desde]'
-  select name='horario[lugar_desde]'
-    - @usuario.lugares.asc.each do |lugar|
-      option value=lugar.id = lugar.datos
-  input type='checkbox' name='horario[clase_en_lugar_desde?]' checked=true value='true' Clase
+  input type='time' name='horario[desde]'
 
   label Hasta
-  input type='time' name='horario[hora_hasta]'
-  select name='horario[lugar_hasta]'
-    - @usuario.lugares.asc.each do |lugar|
-      option value=lugar.id = lugar.datos
-  input type='checkbox' name='horario[clase_en_lugar_hasta?]' checked=true value='true' Clase
+  input type='time' name='horario[hasta]'
 
   br
   input.btn type='submit' value='Agregar'
-  a.btn href='/#{@usuario.correo}/preferencias' Siguiente
+  a.btn href='/#{@usuario.correo}/lugares' Volver

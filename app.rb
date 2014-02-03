@@ -91,15 +91,13 @@ class Horario
   include Mongoid::Document
   
   belongs_to :usuario
-  belongs_to :lugar_desde, class_name: 'Lugar', inverse_of: nil
-  belongs_to :lugar_hasta, class_name: 'Lugar', inverse_of: nil
+  belongs_to :lugar
   
   field :día
-  field :hora_desde
-  field :hora_hasta
+  field :desde
+  field :hasta
 
-  field :clase_en_lugar_desde?, type: Boolean
-  field :clase_en_lugar_hasta?, type: Boolean
+  field :modalidad
 
   Días = [
     'Lunes',
@@ -110,6 +108,14 @@ class Horario
     'Sábado',
     'Domingo'
   ]
+
+  Modalidades = [
+    'En domicilio',
+    'A domicilio'
+  ]
+
+  validates_inclusion_of :día, in: Días
+  validates_inclusion_of :modalidad, in: Modalidades
 end
 
 
@@ -118,7 +124,6 @@ class Localidad
 
   has_many :lugares
   has_many :lugares_precargados
-  has_and_belongs_to_many :usuarios
 
   field :barrio
   field :comuna
@@ -138,25 +143,40 @@ class Lugar
 
   belongs_to :localidad
   belongs_to :usuario
+  has_and_belongs_to_many :zonas, class_name: 'Localidad', inverse_of: nil
+  has_many :horarios
 
   field :establecimiento
   field :calle
   field :altura
-  field :departamento
+  field :timbre
+
+  field :tipo
+  field :nombre
 
   field :longitud, type: Float
   field :latitud, type: Float
 
-  field :público?, type: Boolean
+  Tipos = [
+    'Domicilio',
+    'Café',
+    'Facultad',
+    'Biblioteca'
+  ]
 
-  def datos
-    if not establecimiento.empty?
-      establecimiento
-    elsif not (calle.empty? || altura.empty?)
-      calle + ' ' + altura
-    else
-      localidad.barrio || localidad.localidad
-    end
+  validates_inclusion_of :tipo, in: Tipos
+  
+  before_create :generar_nombre
+  
+  def generar_nombre
+    self.nombre =
+      if not establecimiento.empty?
+        establecimiento
+      elsif not (calle.empty? || altura.empty?)
+        calle + ' ' + altura
+      else
+        localidad.barrio || localidad.localidad
+      end
   end
 end
 
@@ -466,10 +486,10 @@ post '/:correo/lugares' do
 end
 
 
-delete '/:correo/lugares/:id' do
+delete '/:correo/lugares/:lugar' do
   @usuario = Usuario.find_by(correo: params[:correo])
 
-  @usuario.lugares.find(params[:id]).delete
+  @usuario.lugares.find_by(nombre: params[:lugar]).delete
 
   redirect to "/#{@usuario.correo}/lugares"
 end
@@ -477,8 +497,12 @@ end
 
 ### HORARIOS ###
 
-get '/:correo/horarios' do
+get '/:correo/lugares/:lugar/horarios' do
   @usuario = Usuario.find_by(correo: params[:correo])
+
+  @lugar = @usuario.lugares.find_by(nombre: params[:lugar].gsub('_', ' '))
+  
+  @horarios = @lugar.horarios
 
   slim :horarios
 end

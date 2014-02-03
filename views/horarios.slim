@@ -1,33 +1,33 @@
 h2 = 'Horarios para ' + @lugar.nombre
 
-- unless @horarios.empty?
+- unless @lugar.horarios.empty?
   table.table-striped
     thead
       tr
+        th Modalidad
         th Día
         th Desde
         th Hasta
         th
     tbody
-      - @horarios.each do |horario|
+      - @lugar.horarios.each do |horario|
         tr
           td = horario.modalidad
           td = horario.día
           td = horario.desde
           td = horario.hasta
           td
-            form action="/#{@usuario.correo}/horarios/#{horario.id}" method='POST'
+            form.link action="/#{@usuario.correo}/horarios/#{horario.id}" method='POST'
               input type='hidden' name='_method' value='DELETE'
               input.btn-link type='submit' value='Eliminar'
 - else
   p Agregá al menos un segmento horario. Puede ser en cualquier día de la semana desde las 7:00 hasta las 23:00.
 
+h3 Agregar un horario:
+
 form.form-horizontal action='/#{@usuario.correo}/horarios' method='POST'
 
-  label Modalidad
-  input type='radio' name='horario[modalidad]' value='A domicilio' Desde este lugar
-  br
-  input type='radio' name='horario[modalidad]' value='En domicilio' En este lugar
+  input type='hidden' name='lugar_id' value=@lugar.id
 
   label Día
   select name='horario[día]'
@@ -40,6 +40,9 @@ form.form-horizontal action='/#{@usuario.correo}/horarios' method='POST'
   label Hasta
   input type='time' name='horario[hasta]'
 
-  br
-  input.btn type='submit' value='Agregar'
-  a.btn href='/#{@usuario.correo}/lugares' Volver
+  label Modalidad
+  - Horario::Modalidades.each do |modalidad|
+    input type='radio' name='horario[modalidad]' value=modalidad = modalidad
+    br
+
+  input.btn.btn-primary type='submit' value='Agregar'

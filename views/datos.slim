@@ -20,22 +20,11 @@ form action='/#{@usuario.correo}/datos' method='POST'
   br
 
   input type='radio' name='datos[rol]' value='Profesor' checked=(@usuario.rol == 'Profesor') Profesor
-  br
-  
-  h3 Modalidad
+  br 
 
-  input type='checkbox' name='datos[clases_a_domicilio?]' value='true' checked=@usuario.clases_a_domicilio? A domicilio
-  br
+  //- if @usuario.estado == 'Habilitado'
+  //  input.btn.btn-danger type='submit' name='estado' value='Deshabilitar'
+  //- else
+  //  input.btn.btn-success type='submit' name='estado' value='Habilitar'
 
-  input type='checkbox' name='datos[clases_en_lugar_público?]' value='true' checked=@usuario.clases_en_lugar_público? Lugar público
-  br
-
-  input type='checkbox' name='datos[clases_en_domicilio?]' value='true' checked=@usuario.clases_en_domicilio? En domicilio
-  br
-
-  - if @usuario.estado == 'Habilitado'
-    input.btn.btn-danger type='submit' name='estado' value='Deshabilitar'
-  - else
-    input.btn.btn-success type='submit' name='estado' value='Habilitar'
-
-  input.btn type='submit' value='Finalizar'
+  input.btn.btn-primary type='submit' value='Aceptar'

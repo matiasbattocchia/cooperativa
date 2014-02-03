@@ -80,14 +80,14 @@ localidades = [
 
 lugares_precargados = [
   {localidad:
-     {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '13',  barrio: 'Núñes'},
+     {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '13',  barrio: 'Núñez'},
    lugar:
-     {establecimiento: 'Ciudad Universitaria', tipo: 'Facultad', longitud: -58.123, latitud: -38.123}
+     {establecimiento: 'Ciudad Universitaria', tipo: 'Facultad', longitud: -58.4410214, latitud: -34.5430098}
   },
   {localidad:
-     {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '13', barrio: 'Núñez'},
+     {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '2', barrio: 'Recoleta'},
    lugar:
-     {establecimiento: 'Facultad de Ciencias Sociales (UBA)', tipo: 'Facultad', longitud: -58.123, latitud: -38.123}
+     {establecimiento: 'Sociales (Sede Recoleta)', calle: 'Marcelo T. de Alvear', altura: '2230', tipo: 'Facultad', longitud: -58.3992804, latitud: -34.5969861}
   }
 ]
 

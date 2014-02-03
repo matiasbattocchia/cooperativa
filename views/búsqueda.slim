@@ -1,0 +1,27 @@
+h2 Búsqueda
+
+- materias = @alumno.materias.map(&:nombre)
+
+h4 = "Buscando #{materias.join(', ')}."
+
+table.table-striped
+  thead
+    tr
+      th Profesor
+      th Materias
+      th Tiempo
+      th Disponibilidad
+  tbody
+    - @profesores.each do |profesor_id, horarios|
+      - profesor = Usuario.find(profesor_id)
+      tr
+        td
+          a href="/#{profesor.correo}/datos" = profesor.nombre
+
+        td = (profesor.materias.map(&:nombre) & materias).join(', ')
+        - tiempo = horarios.reduce(0) do |suma, horario| suma + horario[:tiempo] end
+        td = (tiempo / 60).to_s + ' horas ' + (tiempo % 60).to_s + ' minutos'
+        td
+          - horarios.each do |horario|
+            = horario[:modalidad] + ' - ' + horario[:día] + ' de ' + horario[:desde] + ' a ' + horario[:hasta] + " (#{horario[:tiempo] / 60} horas #{horario[:tiempo] % 60} minutos)" + ' a %.2f km' % horario[:distancia]
+            br

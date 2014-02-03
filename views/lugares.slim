@@ -29,6 +29,15 @@ h3 Agregar un lugar:
 
 form.form-horizontal action='/#{@usuario.correo}/lugares' method='POST'
 
+  h5 Lugar precargado
+  select name='lugar_precargado_id'
+    - Lugar.where(usuario: nil).asc(:nombre).each do |lugar|
+      option value=lugar.id = lugar.nombre
+  
+  input.btn type='submit' name='lugar_precargado' value='Agregar'
+  
+  h5 Lugar nuevo
+
   == slim :localidades
 
   label Calle
@@ -49,5 +58,4 @@ form.form-horizontal action='/#{@usuario.correo}/lugares' method='POST'
       option value=tipo = tipo
 
   br
-  input.btn type='submit' value='Agregar'
-  a.btn href='/#{@usuario.correo}/datos' Siguiente
+  input.btn.btn-primary type='submit' value='Agregar'

@@ -2,8 +2,16 @@ h2 Materias
 
 form action='/#{@usuario.correo}/materias' method='POST'
 
-  - @materias.each do |materia|
-    input type='checkbox' name='materias[]' value=materia.id checked=materia.usuarios.find(@usuario) = materia.nombre + ' (' + materia.nivel + ')'
+  h3 Secundario
+
+  - @materias.where(nivel: 'Secundario').each do |materia|
+    input type='checkbox' name='materias[]' value=materia.id checked=materia.usuarios.find(@usuario) = materia.nombre
     br
 
-  input.btn type='submit' value='Siguiente'
+  h3 CBC
+
+  - @materias.where(nivel: 'CBC').each do |materia|
+    input type='checkbox' name='materias[]' value=materia.id checked=materia.usuarios.find(@usuario) = materia.nombre
+    br
+
+  input.btn.btn-primary type='submit' value='Aceptar'

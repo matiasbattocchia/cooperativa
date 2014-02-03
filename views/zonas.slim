@@ -1,26 +1,29 @@
-h2 Limitar búsqueda (opcional)
+h2 = 'Zonas para ' + @lugar.nombre
 
-- unless @usuario.localidades.empty?
+- unless @usuario.zonas.empty?
   table.table-striped
     thead
       tr
         th
         th
     tbody
-      - @usuario.localidades.each do |localidad|
+      - @usuario.zonas.each do |zona|
         tr
-          td = localidad.datos
+          td = zona.nombre
           td
-            form action="/#{@usuario.correo}/preferencias/#{localidad.id}" method='POST'
+            form.link action="/#{@usuario.correo}/zonas/#{zona.id}" method='POST'
               input type='hidden' name='_method' value='DELETE'
               input.btn-link type='submit' value='Eliminar'
 - else
-  p Agregá localidades para limitar la búsqueda.
+  p Opcional: Agregá zonas que limiten la búsqueda.
 
-form action='/#{@usuario.correo}/preferencias' method='POST'
+h3 Agregar una zona:
 
+form.form-horizontal action='/#{@usuario.correo}/zonas' method='POST'
+
+  input type='hidden' name='lugar_id' value=@lugar.id
+  
   == slim :localidades
 
   br
-  input.btn type='submit' value='Agregar'
-  a.btn href='/#{@usuario.correo}/datos' Siguiente
+  input.btn.btn-primary type='submit' value='Agregar'

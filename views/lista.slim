@@ -1,0 +1,13 @@
+h2 Profesores
+
+table.table-striped
+  thead
+    tr
+      th Nombre
+      th ¿Activo?
+  tbody
+    - @profesores.each do |profesor|
+      tr
+        td
+          a href="/#{profesor.correo}/datos" = profesor.nombre
+        td = profesor.estado

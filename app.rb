@@ -37,7 +37,14 @@ class Usuario
   field :teléfono
 
   field :rol
-  field :estado, default: 'Deshabilitado'
+  field :estado, default: 'Habilitado'
+
+  Estados = [
+    'Habilitado',
+    'Desabilitado'
+  ]
+
+  validates_inclusion_of :estado, in: Estados
 end
 
 
@@ -121,6 +128,14 @@ class Zona
   belongs_to :usuario
   belongs_to :localidad
   belongs_to :lugar
+
+  field :nombre
+
+  before_create :generar_nombre
+
+  def generar_nombre
+    self.nombre = localidad.nombre
+  end
 end
 
 
@@ -147,8 +162,8 @@ class Horario
   ]
 
   Modalidades = [
-    'En domicilio',
-    'A domicilio'
+    'En lugar',
+    'Desde lugar'
   ]
 
   validates_inclusion_of :día, in: Días
@@ -222,48 +237,54 @@ class Integer
   end
 end
 
+# Duración mínima de una clase en minutos.
+
+Duración = 90
+
+
+### BÚSQUEDA ###
+
 get '/:correo/búsqueda' do
   @alumno = Usuario.find_by(correo: params[:correo])
 
-  @profesores = Usuario.where(rol: 'Profesor', estado: 'Habilitado', clases_a_domicilio?: true).in(materia_ids: @alumno.materia_ids)
+  profesores = Usuario.where(rol: 'Profesor', estado: 'Habilitado').in(materia_ids: @alumno.materia_ids)
 
-  @profes = Hash.new { |h,k| h[k]=[] }
+  @profesores = Hash.new { |h,k| h[k]=[] }
 
-  @profesores.each do |profesor|
+  profesores.each do |profesor|
     profesor.horarios.each do |horario_profesor|
       @alumno.horarios.each do |horario_alumno|
         if (día = horario_profesor.día) == horario_alumno.día
           hora_desde =
-            horario_profesor.hora_desde.en_minutos <=
-              horario_alumno.hora_desde.en_minutos ?
-                horario_alumno.hora_desde : horario_profesor.hora_desde
+            horario_profesor.desde.en_minutos <
+              horario_alumno.desde.en_minutos ?
+                horario_alumno.desde : horario_profesor.desde
           
           hora_hasta =
-            horario_profesor.hora_hasta.en_minutos <=
-              horario_alumno.hora_hasta.en_minutos ?
-                horario_profesor.hora_hasta : horario_alumno.hora_hasta
+            horario_profesor.hasta.en_minutos <
+              horario_alumno.hasta.en_minutos ?
+                horario_profesor.hasta : horario_alumno.hasta
           
-          if (tiempo = hora_hasta.en_minutos - hora_desde.en_minutos) >= '1:30'.en_minutos
-            
-            pld = horario_profesor.lugar_desde
-            plh = horario_profesor.lugar_hasta
+          if (tiempo = hora_hasta.en_minutos - hora_desde.en_minutos) >= Duración
 
-            ald = horario_alumno.lugar_desde
-            alh = horario_alumno.lugar_hasta
+            distancia = Haversine.distance(
+              horario_profesor.lugar.latitud,
+              horario_profesor.lugar.longitud,
+              horario_alumno.lugar.latitud,
+              horario_alumno.lugar.longitud)
 
-            distancia = Haversine.distance(pld.latitud, pld.longitud, ald.latitud, ald.longitud)
-
-
-            @profes[profesor.id] << {día: día, desde: hora_desde, hasta: hora_hasta, horario_profesor: horario_profesor.id, horario_alumno: horario_alumno.id, distancia: distancia, tiempo: tiempo}
-        
+            if distancia < 0.01 || horario_profesor.modalidad != horario_alumno.modalidad
+              @profesores[profesor.id] << {día: día, desde: hora_desde, hasta: hora_hasta, horario_profesor: horario_profesor.id, horario_alumno: horario_alumno.id, distancia: distancia, tiempo: tiempo, modalidad: horario_alumno.modalidad}
+            end
           end
         end
       end
     end
   end
 
-  slim :búsqueda, layout: false
+  slim :búsqueda
 end
+
 
 ### LOGIN ###
 
@@ -300,7 +321,7 @@ post '/:correo/materias' do
     @usuario.materias << Materia.find(materia)
   end
 
-  redirect to "/#{@usuario.correo}/lugares"
+  redirect to "/#{@usuario.correo}/materias"
 end
 
 
@@ -317,26 +338,31 @@ post '/:correo/lugares' do
 
   @usuario = Usuario.find_by(correo: params[:correo])
 
-  if localidad = Localidad.find_by(params[:localidad])
-    lugar = Lugar.new(
-      params[:lugar].delete_if { |atributo, valor|
-        valor.empty? })
+  if params[:lugar_precargado]
+    @usuario.lugares << Lugar.where(usuario: nil).find(params[:lugar_precargado_id]).clone
+  else
+    if localidad = Localidad.find_by(params[:localidad])
+      lugar = Lugar.new(
+        params[:lugar].delete_if { |atributo, valor|
+          valor.empty? })
 
-    query = "address=#{lugar.establecimiento},#{lugar.altura} #{lugar.calle},#{localidad.barrio},#{localidad.localidad},#{localidad.nivel_2},#{localidad.nivel_1}&sensor=false".gsub(' ', '+')
+      query = "address=#{lugar.establecimiento},#{lugar.altura} #{lugar.calle},#{localidad.barrio},#{localidad.localidad},#{localidad.nivel_2},#{localidad.nivel_1}&sensor=false".gsub(' ', '+')
 
-    url = 'maps.googleapis.com'
-    urn = '/maps/api/geocode/json?' + query
+      url = 'maps.googleapis.com'
+      urn = '/maps/api/geocode/json?' + query
 
-    respuesta = JSON.parse(Net::HTTP.get(url, urn))
+      respuesta = JSON.parse(Net::HTTP.get(url, urn))
 
-    if respuesta['status'] == 'OK'
-      coordenadas = respuesta["results"].first["geometry"]["location"]
+      if respuesta['status'] == 'OK'
+        coordenadas = respuesta["results"].first["geometry"]["location"]
 
-      lugar.latitud  = coordenadas['lat']
-      lugar.longitud = coordenadas['lng']
-    
-      localidad.lugares << lugar
-      @usuario.lugares << lugar
+        lugar.latitud  = coordenadas['lat']
+        lugar.longitud = coordenadas['lng']
+      
+        lugar.localidad = localidad
+
+        @usuario.lugares << lugar
+      end
     end
   end
 
@@ -367,18 +393,26 @@ end
 post '/:correo/zonas' do
   @usuario = Usuario.find_by(correo: params[:correo])
 
-  @usuario.zonas << Localidad.find_by(params[:localidad])
+  if (localidad = Localidad.find_by(params[:localidad])) &&
+     (lugar = @usuario.lugares.find(params[:lugar_id]))
 
-  redirect to "/#{@usuario.correo}/lugares/#{params[:lugar]}/zonas"
+    zona = Zona.new
+    zona.localidad = localidad
+    zona.lugar = lugar
+
+    @usuario.zonas << zona
+  end
+
+  redirect to "/#{@usuario.correo}/lugares/#{zona.lugar.nombre.gsub(' ', '_')}/zonas"
 end
 
 
 delete '/:correo/zonas/:zona_id' do
   @usuario = Usuario.find_by(correo: params[:correo])
   
-  @usuario.zonas.find(params[:zona_id]).delete
+  (zona = @usuario.zonas.find(params[:zona_id])).delete
 
-  redirect to "/#{@usuario.correo}/lugares/#{params[:lugar]}/zonas"
+  redirect to "/#{@usuario.correo}/lugares/#{zona.lugar.nombre.gsub(' ', '_')}/zonas"
 end
 
 
@@ -389,27 +423,31 @@ get '/:correo/lugares/:lugar/horarios' do
 
   @lugar = @usuario.lugares.find_by(nombre: params[:lugar].gsub('_', ' '))
   
-  @horarios = @lugar.horarios
-
   slim :horarios
 end
 
 
 post '/:correo/horarios' do
   @usuario = Usuario.find_by(correo: params[:correo])
+ 
+  if lugar = @usuario.lugares.find(params[:lugar_id])
+
+    horario = Horario.new(params[:horario])
+    horario.lugar = lugar
+
+    @usuario.horarios << horario
+  end
   
-  @usuario.horarios << Horario.new(params[:horario])
-  
-  redirect to "/#{@usuario.correo}/horarios"
+  redirect to "/#{@usuario.correo}/lugares/#{horario.lugar.nombre.gsub(' ', '_')}/horarios"
 end
 
 
-delete '/:correo/horarios/:id' do
+delete '/:correo/horarios/:horario_id' do
   @usuario = Usuario.find_by(correo: params[:correo])
   
-  @usuario.horarios.find(params[:id]).delete
+  (horario = @usuario.horarios.find(params[:horario_id])).delete
 
-  redirect to "/#{@usuario.correo}/horarios"
+  redirect to "/#{@usuario.correo}/lugares/#{horario.lugar.nombre.gsub(' ', '_')}/horarios"
 end
 
 
@@ -433,8 +471,7 @@ post '/:correo/datos' do
     when 'Deshabilitar' then @usuario.estado = 'Deshabilitado'
     end
     @usuario.save
-    redirect to "/#{@usuario.correo}/datos"
   else
-    redirect to '/'
+    redirect to "/#{@usuario.correo}/datos"
   end
 end

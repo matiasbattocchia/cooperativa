@@ -6,7 +6,6 @@ require 'net/http'
 set :bind, '0.0.0.0'
 
 Bundler.require(:default, :development)
-
 Mongoid.load!('mongoid.yml')
 Mongoid.raise_not_found_error = false
 
@@ -16,43 +15,29 @@ configure :development do
 end
 
 ActiveSupport::Inflector.inflections do |inflect|
-  inflect.irregular('provincia', 'provincias')
-  inflect.singular('provincia', 'provincia') # ActiveSupport bug.
-  inflect.irregular('preferencia', 'preferencias')
   inflect.irregular('usuario', 'usuarios')
   inflect.irregular('materia', 'materias')
-  inflect.irregular('horario', 'horarios')
   inflect.irregular('localidad', 'localidades')
-  inflect.irregular('dirección', 'direcciones')
   inflect.irregular('lugar', 'lugares')
-  inflect.irregular('lugar_precargado', 'lugares_precargados')
-  inflect.irregular('lugarprecargado', 'lugaresprecargados')
+  inflect.irregular('zona', 'zonas')
+  inflect.irregular('horario', 'horarios')
 end
 
 
 class Usuario
   include Mongoid::Document
 
-  has_many :horarios
-  has_many :lugares
-  has_and_belongs_to_many :localidades
   has_and_belongs_to_many :materias
+  has_many :lugares
+  has_many :zonas
+  has_many :horarios
 
   field :nombre
   field :correo
   field :teléfono
 
   field :rol
-
-  field :clases_a_domicilio?, type: Boolean
-  field :clases_en_lugar_público?, type: Boolean
-  field :clases_en_domicilio?, type: Boolean
-
   field :estado, default: 'Deshabilitado'
-
-  # field :institución
-  # field :carrera
-  # field :sede
 end
 
 
@@ -66,24 +51,76 @@ class Materia
   field :código
 end
 
-materias = [
-  {nombre: 'Matemática', nivel: 'Secundario'},
-  {nombre: 'Física', nivel: 'Secundario'},
-  {nombre: 'Química', nivel: 'Secundario'},
-  {nombre: 'Biología', nivel: 'Secundario'},
-  {nombre: 'Inglés', nivel: 'Secundario'},
-  {nombre: 'Matemática', nivel: 'CBC', código: '51'},
-  {nombre: 'Física', nivel: 'CBC', código: '03'},
-  {nombre: 'Química', nivel: 'CBC', código: '05'},
-  {nombre: 'Álgebra', nivel: 'CBC', código: '27'},
-  {nombre: 'Análisis Matemático', nivel: 'CBC', código: '28'},
-  {nombre: 'Biología', nivel: 'CBC', código: '08'},
-]
 
-if Materia.empty?
-  materias.each do |materia|
-     Materia.create(materia)
-   end
+class Localidad
+  include Mongoid::Document
+
+  has_many :lugares
+  has_many :lugares_precargados
+  has_many :zonas
+
+  field :barrio
+  field :comuna
+  field :localidad
+  field :nivel_2
+  field :zona
+  field :nivel_1
+
+  def nombre
+    barrio ? barrio : localidad
+  end
+end
+
+
+class Lugar
+  include Mongoid::Document
+
+  belongs_to :usuario
+  belongs_to :localidad
+  has_many :zonas
+  has_many :horarios
+
+  field :establecimiento
+  field :calle
+  field :altura
+  field :timbre
+
+  field :tipo
+  field :nombre
+
+  field :longitud, type: Float
+  field :latitud, type: Float
+
+  Tipos = [
+    'Domicilio',
+    'Café',
+    'Facultad',
+    'Biblioteca'
+  ]
+
+  validates_inclusion_of :tipo, in: Tipos
+  
+  before_create :generar_nombre
+  
+  def generar_nombre
+    self.nombre =
+      if establecimiento
+        establecimiento
+      elsif calle && altura
+        calle + ' ' + altura
+      else
+        localidad.nombre
+      end
+  end
+end
+
+
+class Zona
+  include Mongoid::Document
+  
+  belongs_to :usuario
+  belongs_to :localidad
+  belongs_to :lugar
 end
 
 
@@ -117,180 +154,6 @@ class Horario
   validates_inclusion_of :día, in: Días
   validates_inclusion_of :modalidad, in: Modalidades
 end
-
-
-class Localidad
-  include Mongoid::Document
-
-  has_many :lugares
-  has_many :lugares_precargados
-
-  field :barrio
-  field :comuna
-  field :localidad
-  field :nivel_2
-  field :zona
-  field :nivel_1
-
-  def datos
-    barrio ? barrio : localidad
-  end
-end
-
-
-class Lugar
-  include Mongoid::Document
-
-  belongs_to :localidad
-  belongs_to :usuario
-  has_and_belongs_to_many :zonas, class_name: 'Localidad', inverse_of: nil
-  has_many :horarios
-
-  field :establecimiento
-  field :calle
-  field :altura
-  field :timbre
-
-  field :tipo
-  field :nombre
-
-  field :longitud, type: Float
-  field :latitud, type: Float
-
-  Tipos = [
-    'Domicilio',
-    'Café',
-    'Facultad',
-    'Biblioteca'
-  ]
-
-  validates_inclusion_of :tipo, in: Tipos
-  
-  before_create :generar_nombre
-  
-  def generar_nombre
-    self.nombre =
-      if not establecimiento.empty?
-        establecimiento
-      elsif not (calle.empty? || altura.empty?)
-        calle + ' ' + altura
-      else
-        localidad.barrio || localidad.localidad
-      end
-  end
-end
-
-localidades = [
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '15', barrio: 'Agronomía'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '5',  barrio: 'Almagro'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '3',  barrio: 'Balvanera'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '4',  barrio: 'Barracas'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '13', barrio: 'Belgrano'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '5',  barrio: 'Boedo'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '6',  barrio: 'Caballito'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '15', barrio: 'Chacarita'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '12', barrio: 'Coghlan'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '13', barrio: 'Colegiales'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '1',  barrio: 'Constitución'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '7',  barrio: 'Flores'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '10', barrio: 'Floresta'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '4',  barrio: 'La Boca'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '15', barrio: 'La Paternal'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '9',  barrio: 'Liniers'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '9',  barrio: 'Mataderos'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '10', barrio: 'Monte Castro'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '1',  barrio: 'Monserrat'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '4',  barrio: 'Nueva Pompeya'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '13', barrio: 'Núñez'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '14', barrio: 'Palermo'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '9',  barrio: 'Parque Avellaneda'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '7',  barrio: 'Parque Chacabuco'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '15', barrio: 'Parque Chas'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '4',  barrio: 'Parque Patricios'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '1',  barrio: 'Puerto Madero'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '2',  barrio: 'Recoleta'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '1',  barrio: 'Retiro'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '12', barrio: 'Saavedra'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '3',  barrio: 'San Cristóbal'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '1',  barrio: 'San Nicolás'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '1',  barrio: 'San Telmo'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '10', barrio: 'Vélez Sársfield'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '10', barrio: 'Versalles'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '15', barrio: 'Villa Crespo'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '11', barrio: 'Villa del Parque'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '11', barrio: 'Villa Devoto'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '11', barrio: 'Villa General Mitre'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '8',  barrio: 'Villa Lugano'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '10', barrio: 'Villa Luro'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '15', barrio: 'Villa Ortúzar'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '12', barrio: 'Villa Pueyrredón'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '10', barrio: 'Villa Real'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '8',  barrio: 'Villa Riachuelo'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '11', barrio: 'Villa Santa Rita'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '8',  barrio: 'Villa Soldati'},
-  {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '12', barrio: 'Villa Urquiza'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'Vicente López', localidad: 'Vicente López', barrio: 'Carapachay'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'Vicente López', localidad: 'Vicente López', barrio: 'Florida'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'Vicente López', localidad: 'Vicente López', barrio: 'Florida Oeste'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'Vicente López', localidad: 'Vicente López', barrio: 'La Lucila'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'Vicente López', localidad: 'Vicente López', barrio: 'Munro'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'Vicente López', localidad: 'Vicente López', barrio: 'Olivos'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'Vicente López', localidad: 'Vicente López', barrio: 'Vicente López'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'Vicente López', localidad: 'Vicente López', barrio: 'Villa Adelina'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'Vicente López', localidad: 'Vicente López', barrio: 'Villa Martelli'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'San Isidro', localidad: 'Villa Adelina'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'San Isidro', localidad: 'Boulogne'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'San Isidro', localidad: 'Martínez'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'San Isidro', localidad: 'Acassuso'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'San Isidro', localidad: 'San Isidro'},
-  {nivel_1: 'Buenos Aires', zona: 'Norte', nivel_2: 'San Isidro', localidad: 'Béccar'},
-]
-
-
-class LugarPrecargado
-  include Mongoid::Document
-
-  belongs_to :localidad
-
-  field :establecimiento
-  field :calle
-  field :altura
-  field :departamento
-
-  field :longitud, type: Float
-  field :latitud, type: Float
-
-  field :público?, type: Boolean
-end
-
-
-if Localidad.empty?
-  localidades.each do |localidad|
-    Localidad.create localidad
-  end
-end
-
-
-lugares_precargados = [
-  {localidad:
-     {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '2',  barrio: 'Recoleta'},
-   lugar:
-     {establecimiento: 'Ciudad Universitaria', calle: nil, altura: nil, departamento: nil, longitud: -58.123, latitud: -38.123, público?: true}
-  },
-  {localidad:
-     {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '13', barrio: 'Núñez'},
-   lugar:
-     {establecimiento: 'Facultad de Ciencias Sociales (UBA)', calle: 'Manso', altura: '123', departamento: nil, longitud: -58.123, latitud: -38.123, público?: true}
-  }
-]
-
-
-if LugarPrecargado.empty?
-  lugares_precargados.each do |lugar_precargado|
-    Localidad.find_by(lugar_precargado[:localidad]).lugares_precargados << LugarPrecargado.new(lugar_precargado[:lugar])
-  end
-end
-
 
 # class Clase
 #   include Mongoid::Document
@@ -361,14 +224,6 @@ end
 
 get '/:correo/búsqueda' do
   @alumno = Usuario.find_by(correo: params[:correo])
-
-  # horarios
-  # preferencias de localidad si hay
-
-  # modalidades = []
-  # modalidades << {clases_en_domicilio?: true} if @alumno.clases_a_domicilio?
-  # modalidades << {clases_a_domicilio?: true} if @alumno.clases_en_domicilio?
-  # modalidades << {clases_en_lugar_público?: true} if @alumno.clases_en_lugar_público?
 
   @profesores = Usuario.where(rol: 'Profesor', estado: 'Habilitado', clases_a_domicilio?: true).in(materia_ids: @alumno.materia_ids)
 
@@ -463,7 +318,9 @@ post '/:correo/lugares' do
   @usuario = Usuario.find_by(correo: params[:correo])
 
   if localidad = Localidad.find_by(params[:localidad])
-    localidad.lugares << lugar = Lugar.new(params[:lugar])
+    lugar = Lugar.new(
+      params[:lugar].delete_if { |atributo, valor|
+        valor.empty? })
 
     query = "address=#{lugar.establecimiento},#{lugar.altura} #{lugar.calle},#{localidad.barrio},#{localidad.localidad},#{localidad.nivel_2},#{localidad.nivel_1}&sensor=false".gsub(' ', '+')
 
@@ -477,21 +334,51 @@ post '/:correo/lugares' do
 
       lugar.latitud  = coordenadas['lat']
       lugar.longitud = coordenadas['lng']
+    
+      localidad.lugares << lugar
+      @usuario.lugares << lugar
     end
-
-    @usuario.lugares << lugar
   end
 
   redirect to "/#{@usuario.correo}/lugares"
 end
 
 
-delete '/:correo/lugares/:lugar' do
+delete '/:correo/lugares/:lugar_id' do
   @usuario = Usuario.find_by(correo: params[:correo])
 
-  @usuario.lugares.find_by(nombre: params[:lugar]).delete
+  @usuario.lugares.find(params[:lugar_id]).delete
 
   redirect to "/#{@usuario.correo}/lugares"
+end
+
+
+### ZONAS ###
+
+get '/:correo/lugares/:lugar_nombre/zonas' do
+  @usuario = Usuario.find_by(correo: params[:correo])
+
+  @lugar = @usuario.lugares.find_by(nombre: params[:lugar_nombre].gsub('_', ' '))
+
+  slim :zonas
+end
+
+
+post '/:correo/zonas' do
+  @usuario = Usuario.find_by(correo: params[:correo])
+
+  @usuario.zonas << Localidad.find_by(params[:localidad])
+
+  redirect to "/#{@usuario.correo}/lugares/#{params[:lugar]}/zonas"
+end
+
+
+delete '/:correo/zonas/:zona_id' do
+  @usuario = Usuario.find_by(correo: params[:correo])
+  
+  @usuario.zonas.find(params[:zona_id]).delete
+
+  redirect to "/#{@usuario.correo}/lugares/#{params[:lugar]}/zonas"
 end
 
 
@@ -523,33 +410,6 @@ delete '/:correo/horarios/:id' do
   @usuario.horarios.find(params[:id]).delete
 
   redirect to "/#{@usuario.correo}/horarios"
-end
-
-
-### PREFERENCIAS ###
-
-get '/:correo/preferencias' do
-  @usuario = Usuario.find_by(correo: params[:correo])
-
-  slim :preferencias
-end
-
-
-post '/:correo/preferencias' do
-  @usuario = Usuario.find_by(correo: params[:correo])
-
-  @usuario.localidades << Localidad.find_by(params[:localidad])
-
-  redirect to "/#{@usuario.correo}/preferencias"
-end
-
-
-delete '/:correo/preferencias/:id' do
-  @usuario = Usuario.find_by(correo: params[:correo])
-  
-  @usuario.localidades.find(params[:id]).delete
-
-  redirect to "/#{@usuario.correo}/preferencias"
 end
 
 

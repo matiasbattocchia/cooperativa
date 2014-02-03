@@ -8,6 +8,7 @@ h2 Lugares y Horarios
         th
         th
         th
+        th
     tbody
       - @usuario.lugares.each do |lugar|
         tr
@@ -16,7 +17,9 @@ h2 Lugares y Horarios
           td
             a href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/horarios" Horarios
           td
-            form.link action="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}" method='POST'
+            a href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/zonas" Zonas
+          td
+            form.link action="/#{@usuario.correo}/lugares/#{lugar.id}" method='POST'
               input type='hidden' name='_method' value='DELETE'
               input.btn-link type='submit' value='Eliminar'
 - else

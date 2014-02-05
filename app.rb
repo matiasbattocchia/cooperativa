@@ -141,6 +141,34 @@ post '/' do
 end
 
 
+### DATOS ###
+
+get '/:correo/datos' do
+  @usuario = Usuario.find_by(correo: params[:correo])
+
+  slim :datos
+end
+
+
+post '/:correo/datos' do
+  @usuario = Usuario.find_by(correo: params[:correo])
+
+  @usuario.update_attributes(params[:datos])
+
+  flash[:message] = 'Guardado.'
+
+  if params[:estado]
+    case params[:estado]
+    when 'Habilitar' then @usuario.estado = 'Habilitado'
+    when 'Deshabilitar' then @usuario.estado = 'Deshabilitado'
+    end
+    @usuario.save
+  else
+    redirect to "/#{@usuario.correo}/datos"
+  end
+end
+
+
 ### MATERIAS ###
 
 get '/:correo/materias' do
@@ -293,29 +321,18 @@ delete '/:correo/horarios/:horario_id' do
 end
 
 
-### DATOS ###
+### Agenda ###
 
-get '/:correo/datos' do
+get '/:correo/agenda' do
   @usuario = Usuario.find_by(correo: params[:correo])
 
-  slim :datos
-end
-
-
-post '/:correo/datos' do
-  @usuario = Usuario.find_by(correo: params[:correo])
-
-  @usuario.update_attributes(params[:datos])
-
-  flash[:message] = 'Guardado.'
-
-  if params[:estado]
-    case params[:estado]
-    when 'Habilitar' then @usuario.estado = 'Habilitado'
-    when 'Deshabilitar' then @usuario.estado = 'Deshabilitado'
+  - Horario::Días.each do |día|
+    @usuario.horarios.where(día: día).each do |horario|
+      
+      
+      @segmentos = []  
     end
-    @usuario.save
-  else
-    redirect to "/#{@usuario.correo}/datos"
   end
+
+  slim :agenda
 end

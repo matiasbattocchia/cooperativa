@@ -1,0 +1,16 @@
+h2 Agenda
+
+.row
+  - Horario::Días.each do |día|
+    .col-md-1
+      table.table
+        thead
+          tr
+            th = día
+        tbody
+          - @segmentos.where(día: día).each do |segmento|
+            tr
+              td class=segmento.modalidad #{segmento.desde} a #{segmento.hasta}
+
+form
+  

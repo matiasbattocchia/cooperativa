@@ -1,61 +1,77 @@
 h2 Lugares y Horarios
 
-- unless @usuario.lugares.empty?
-  table.table-striped
-    thead
-      tr
-        th
-        th
-        th
-        th
-        th
-    tbody
-      - @usuario.lugares.each do |lugar|
-        tr
-          td.mapa style='width: 140px; height: 140px' data-latitud=lugar.latitud data-longitud=lugar.longitud
-          td = lugar.nombre
-          td
-            a href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/horarios" Horarios
-          td
-            a href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/zonas" Zonas
-          td
-            form.link action="/#{@usuario.correo}/lugares/#{lugar.id}" method='POST'
-              input type='hidden' name='_method' value='DELETE'
-              input.btn-link type='submit' value='Eliminar'
-- else
-  p Agregá al menos un lugar.
+.row
+  .col-md-6
 
-h3 Agregar un lugar:
+    h3 Lugar precargado
+    
+    form action='/#{@usuario.correo}/lugares' method='POST'
 
-form.form-horizontal action='/#{@usuario.correo}/lugares' method='POST'
+      .input-group
+        select.form-control name='lugar_precargado_id'
+          - Lugar.where(usuario: nil).asc(:nombre).each do |lugar|
+            option value=lugar.id = lugar.nombre
+        span.input-group-btn
+          button.btn.btn-primary type='submit' name='lugar_precargado' Agregar
+      
+    h3 Lugar nuevo
+    
+    form.form-horizontal action='/#{@usuario.correo}/lugares' method='POST'
 
-  h5 Lugar precargado
-  select name='lugar_precargado_id'
-    - Lugar.where(usuario: nil).asc(:nombre).each do |lugar|
-      option value=lugar.id = lugar.nombre
-  
-  input.btn type='submit' name='lugar_precargado' value='Agregar'
-  
-  h5 Lugar nuevo
+      .form-group
+        label.col-md-2.control-label Tipo
+        .col-md-10
+          select.form-control name='lugar[tipo]'
+            - Lugar::Tipos.each do |tipo|
+              option value=tipo = tipo
 
-  == slim :localidades
+      == slim :localidades
 
-  label Calle
-  input type='text' name='lugar[calle]'
+      .form-group
+        label.sr-only Calle
+        .col-md-6
+          input.form-control type='text' name='lugar[calle]' placeholder='Calle'
 
-  label Altura
-  input type='text' name='lugar[altura]'
+        label.sr-only Altura
+        .col-md-3
+          input.form-control type='text' name='lugar[altura]' placeholder='Altura'
 
-  label Timbre
-  input type='text' name='lugar[timbre]'
+        label.sr-only Timbre
+        .col-md-3
+          input.form-control type='text' name='lugar[timbre]' placeholder='Timbre'
 
-  label Establecimiento
-  input type='text' name='lugar[establecimiento]'
+      .form-group
+        label.sr-only Establecimiento
+        .col-md-12
+          input.form-control type='text' name='lugar[establecimiento]' placeholder='Establecimiento'
 
-  label Tipo
-  select name='lugar[tipo]'
-    - Lugar::Tipos.each do |tipo|
-      option value=tipo = tipo
+      .form-group
+        .col-md-12
+          button.btn.btn-primary.pull-right type='submit' Agregar
 
-  br
-  input.btn.btn-primary type='submit' value='Agregar'
+  .col-md-6
+
+    - unless @usuario.lugares.empty?
+      table.table
+        thead
+          tr
+            th
+            th
+            th
+            th
+            th
+        tbody
+          - @usuario.lugares.each do |lugar|
+            tr
+              td.mapa style='width: 140px; height: 140px' data-latitud=lugar.latitud data-longitud=lugar.longitud
+              td = lugar.nombre
+              td
+                a href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/horarios" Horarios
+              td
+                a href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/zonas" Zonas
+              td
+                form.link action="/#{@usuario.correo}/lugares/#{lugar.id}" method='POST'
+                  input type='hidden' name='_method' value='DELETE'
+                  input.btn-link type='submit' value='Eliminar'
+    - else
+      p Agregá al menos un lugar.

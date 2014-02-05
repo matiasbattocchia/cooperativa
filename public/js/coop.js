@@ -104,7 +104,21 @@ function initialize() {
 
 // window.onload = loadScript;
 
-$(document).on("click", ".open-AddBookDialog", function () {
-  var myBookId = $(this).data('id');
-  $(".modal-body #bookId").val( myBookId );
+$(document).on("click", ".abrir-modalPedido", function () {
+  var profesor = $(this).data('profesor');
+  var materias = $(this).data('materias');
+  var lugar = $(this).data('lugar');
+  var día = $(this).data('día');
+  var desde = $(this).data('desde');
+  var hasta = $(this).data('hasta');
+  var horarioAlumno = $(this).data('horario_alumno');
+  var horarioProfesor = $(this).data('horario_profesor');
+  $("#modalPedido .modal-title").text( "Clase con " + profesor );
+  $("#modalPedido #materias").text( materias );
+  $("#modalPedido #lugar").text( lugar );
+  $("#modalPedido #día").val( día );
+  $("#modalPedido #desde").val( desde );
+  $("#modalPedido #hasta").val( hasta );
+  $("#modalPedido #horarioAlumno").val( horarioAlumno );
+  $("#modalPedido #horarioProfesor").val( horarioProfesor );
 });

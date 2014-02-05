@@ -19,16 +19,18 @@ html
   body
     .container
       h1 La Cooperativa
-      p  Clases más baratas, profesores mejores pagos.
+      p.lead Clases más baratas, profesores mejores pagos.
 
       ul.nav.nav-pills
-        li
-          a href="/#{params[:correo]}/materias" Materias
-        li
-          a href="/#{params[:correo]}/lugares" Lugares y Horarios
-        li
+        li class=('active' if request.path_info =~ /datos/)
           a href="/#{params[:correo]}/datos" Datos
-        li
+        li class=('active' if request.path_info =~ /materias/)
+          a href="/#{params[:correo]}/materias" Materias
+        li class=('active' if request.path_info =~ /lugares/)
+          a href="/#{params[:correo]}/lugares" Lugares y Horarios
+        li class=('active' if request.path_info =~ /agenda/)
+          a href="/#{params[:correo]}/agenda" Agenda
+        li class=('active' if request.path_info =~ /b%C3%BAsqueda/)
           a href="/#{params[:correo]}/búsqueda" Búsqueda
 
       - if flash[:message]

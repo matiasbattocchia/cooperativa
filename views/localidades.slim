@@ -1,13 +1,19 @@
-label Provincia
-select#provincia name='localidad[nivel_1]'
-  - Localidad.all.distinct(:nivel_1).each do |provincia|
-    option value=provincia selected=(provincia == 'Ciudad Autónoma de Buenos Aires') = provincia
+.form-group
+  label.col-md-2.control-label Provincia
+  .col-md-10
+    select#provincia.form-control name='localidad[nivel_1]'
+      - Localidad.all.distinct(:nivel_1).each do |provincia|
+        option value=provincia selected=(provincia == 'Ciudad Autónoma de Buenos Aires') = provincia
 
-label Localidad
-select#localidad name='localidad[localidad]'
-  option value='Buenos Aires' selected=true Buenos Aires
+.form-group
+  label.col-md-2.control-label Localidad
+  .col-md-10
+    select#localidad.form-control name='localidad[localidad]'
+      option value='Buenos Aires' selected=true Buenos Aires
 
-label Barrio
-select#barrio name='localidad[barrio]'
-  - Localidad.where(nivel_1: 'Ciudad Autónoma de Buenos Aires').distinct(:barrio).sort.each do |barrio|
-    option value=barrio = barrio
+.form-group
+  label.col-md-2.control-label Barrio
+  .col-md-10
+    select#barrio.form-control name='localidad[barrio]'
+      - Localidad.where(nivel_1: 'Ciudad Autónoma de Buenos Aires').distinct(:barrio).sort.each do |barrio|
+        option value=barrio = barrio

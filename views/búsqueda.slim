@@ -1,23 +1,40 @@
-<!-- Modal -->
-.modal.fade#myModal tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+.modal.fade#modalPedido tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'
   .modal-dialog
     .modal-content
       .modal-header
-        button.close type="button" data-dismiss="modal" aria-hidden="true" &times;
-        h4.modal-title#myModalLabel Modal title
+        button.close type='button' data-dismiss='modal' aria-hidden='true' &times;
+        h4.modal-title
+        p#materias
       .modal-body
-        p ...
+        h4 Lugar
+        
+        //.mapa style='width: 140px; height: 140px' data-latitud=lugar.latitud data-longitud=lugar.longitud
+        p#lugar
+
+        h4 Horario
+
+        form action=''
+          label Día
+          input#día.form-control type='text' name='horario[día]' disabled=true
+
+          label Desde
+          input#desde.form-control type='time' name='horario[desde]'
+
+          label Hasta
+          input#hasta.form-control type='time' name='horario[hasta]'
+
+          input#horarioAlumno type='hidden' name=''
+          input#horarioProfesor type='hidden' name=''
+
       .modal-footer
-        button.btn.btn-default type="button" data-dismiss="modal" Close
-        button.btn.btn-primary type="button" Save changes
+        button.btn.btn-default type='button' data-dismiss='modal' Cerrar
+        button.btn.btn-primary type='button' Enviar
 
-button.btn.btn-primary.btn-lg data-toggle="modal" data-target="#myModal" Launch demo modal
 
-h2 Búsqueda
 
 - materias = @alumno.materias.map(&:nombre)
 
-h4 = "Buscando #{materias.join(', ')}."
+h2 Búsqueda (#{materias.join(', ')})
 
 table.table
   thead
@@ -33,8 +50,11 @@ table.table
       tr
         td
           a href="/#{opcion[:profesor].correo}/datos" = opcion[:profesor].nombre
-        td = (opcion[:profesor].materias.map(&:nombre) & materias).join(', ')
-        td = opcion[:horario_alumno].modalidad == 'En lugar' ? opcion[:horario_alumno].lugar.nombre : opcion[:horario_profesor].lugar.nombre + ' (%.2f km)' % opcion[:distancia]
+        - materias_en_común = (opcion[:profesor].materias.map(&:nombre) & materias).join(', ')
+        td = materias_en_común
+        - lugar = opcion[:horario_alumno].modalidad == 'En lugar' ? opcion[:horario_alumno].lugar.nombre : opcion[:horario_profesor].lugar.nombre + ', ' + opcion[:horario_profesor].lugar.localidad.nombre + ' (%.2f km)' % opcion[:distancia]
+        td = lugar
         td = opcion[:horario_alumno].día
         td #{opcion[:desde]} a #{opcion[:hasta]} (#{opcion[:tiempo] / 60} horas #{opcion[:tiempo] % 60} minutos)
-        td Botón
+        td
+          a.abrir-modalPedido data-toggle='modal' data-target='#modalPedido' data-profesor=opcion[:profesor].nombre data-materias=materias_en_común data-día=opcion[:horario_alumno].día data-desde=opcion[:desde] data-hasta=opcion[:hasta] data-horario_profesor=opcion[:horario_profesor].id data-horario_alumno=opcion[:horario_alumno].id data-lugar=lugar Pedir

@@ -1,27 +1,40 @@
+<!-- Modal -->
+.modal.fade#myModal tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+  .modal-dialog
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-hidden="true" &times;
+        h4.modal-title#myModalLabel Modal title
+      .modal-body
+        p ...
+      .modal-footer
+        button.btn.btn-default type="button" data-dismiss="modal" Close
+        button.btn.btn-primary type="button" Save changes
+
+button.btn.btn-primary.btn-lg data-toggle="modal" data-target="#myModal" Launch demo modal
+
 h2 Búsqueda
 
 - materias = @alumno.materias.map(&:nombre)
 
 h4 = "Buscando #{materias.join(', ')}."
 
-table.table-striped
+table.table
   thead
     tr
       th Profesor
       th Materias
-      th Tiempo
-      th Disponibilidad
+      th Lugar
+      th Día
+      th Horario
+      th
   tbody
-    - @profesores.each do |profesor_id, horarios|
-      - profesor = Usuario.find(profesor_id)
+    - @opciones.each do |opcion|
       tr
         td
-          a href="/#{profesor.correo}/datos" = profesor.nombre
-
-        td = (profesor.materias.map(&:nombre) & materias).join(', ')
-        - tiempo = horarios.reduce(0) do |suma, horario| suma + horario[:tiempo] end
-        td = (tiempo / 60).to_s + ' horas ' + (tiempo % 60).to_s + ' minutos'
-        td
-          - horarios.each do |horario|
-            = horario[:modalidad] + ' - ' + horario[:día] + ' de ' + horario[:desde] + ' a ' + horario[:hasta] + " (#{horario[:tiempo] / 60} horas #{horario[:tiempo] % 60} minutos)" + ' a %.2f km' % horario[:distancia]
-            br
+          a href="/#{opcion[:profesor].correo}/datos" = opcion[:profesor].nombre
+        td = (opcion[:profesor].materias.map(&:nombre) & materias).join(', ')
+        td = opcion[:horario_alumno].modalidad == 'En lugar' ? opcion[:horario_alumno].lugar.nombre : opcion[:horario_profesor].lugar.nombre + ' (%.2f km)' % opcion[:distancia]
+        td = opcion[:horario_alumno].día
+        td #{opcion[:desde]} a #{opcion[:hasta]} (#{opcion[:tiempo] / 60} horas #{opcion[:tiempo] % 60} minutos)
+        td Botón

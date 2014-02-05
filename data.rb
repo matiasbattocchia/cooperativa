@@ -105,6 +105,6 @@ end
 
 if Lugar.empty?
   lugares_precargados.each do |lugar_precargado|
-    Localidad.find_by(lugar_precargado[:localidad]).lugares_precargados << Lugar.new(lugar_precargado[:lugar])
+    Localidad.find_by(lugar_precargado[:localidad]).lugares << Lugar.new(lugar_precargado[:lugar])
   end
 end

@@ -26,8 +26,8 @@ h2 = 'Zonas para ' + @lugar.nombre
               td = zona.localidad.barrio || '-'
               td = zona.localidad.localidad
               td
-                form action="/#{@usuario.correo}/zonas/#{zona.id}" method='POST'
+                form.form-table action="/#{@usuario.correo}/zonas/#{zona.id}" method='POST'
                   input type='hidden' name='_method' value='DELETE'
-                  button.btn-link type='submit' Eliminar
+                  button.btn.btn-link.btn-table-link type='submit' Eliminar
     - else
       p Opcional: Agregá zonas que limiten la búsqueda.

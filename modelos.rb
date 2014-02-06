@@ -38,7 +38,7 @@ class Usuario
   ]
 
   validates_uniqueness_of :correo
-  validates_inclusion_of :rol, in: Roles
+  validates_inclusion_of :rol, in: Roles, allow_nil: true
   validates_inclusion_of :estado, in: Estados
 end
 

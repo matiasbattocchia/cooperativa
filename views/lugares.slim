@@ -68,7 +68,7 @@ h2 Lugares y Horarios
                 
                 a.btn.btn-link href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/zonas" Zonas
                 
-                form.link action="/#{@usuario.correo}/lugares/#{lugar.id}" method='POST'
+                form action="/#{@usuario.correo}/lugares/#{lugar.id}" method='POST'
                   input type='hidden' name='_method' value='DELETE'
                   button.btn.btn-link type='submit' Eliminar
     - else

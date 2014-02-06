@@ -1,8 +1,13 @@
-form.link {
+.btn-table-link {
   margin: 0;
-}
-
-form.link > input {
   padding: 0;
   border: 0;
+}
+
+.form-table {
+  height: 20px;
+}
+
+.nav {
+  margin-bottom: 20px;
 }

@@ -52,9 +52,9 @@ h2 = 'Horarios para ' + @lugar.nombre
               td = horario.desde
               td = horario.hasta
               td
-                form action="/#{@usuario.correo}/horarios/#{horario.id}" method='POST'
+                form.form-table action="/#{@usuario.correo}/horarios/#{horario.id}" method='POST'
                   input type='hidden' name='_method' value='DELETE'
-                  button.btn.btn-link type='submit' Eliminar
+                  button.btn.btn-link.btn-table-link type='submit' Eliminar
     - else
       p Agregá al menos un segmento horario. Puede ser en cualquier día de la semana desde las 7:00 hasta las 23:00.
 

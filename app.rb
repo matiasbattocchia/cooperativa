@@ -288,10 +288,10 @@ end
 
 ### HORARIOS ###
 
-get '/:correo/lugares/:lugar/horarios' do
+get '/:correo/lugares/:lugar_nombre/horarios' do
   @usuario = Usuario.find_by(correo: params[:correo])
 
-  @lugar = @usuario.lugares.find_by(nombre: params[:lugar].gsub('_', ' '))
+  @lugar = @usuario.lugares.find_by(nombre: params[:lugar_nombre].gsub('_', ' '))
   
   slim :horarios
 end

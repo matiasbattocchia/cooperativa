@@ -116,7 +116,7 @@ $(document).on("click", ".abrir-modalPedido", function () {
   $("#modalPedido .modal-title").text( "Clase con " + profesor );
   $("#modalPedido #materias").text( materias );
   $("#modalPedido #lugar").text( lugar );
-  $("#modalPedido #día").val( día );
+  $("#modalPedido #día").text( día );
   $("#modalPedido #desde").val( desde );
   $("#modalPedido #hasta").val( hasta );
   $("#modalPedido #horarioAlumno").val( horarioAlumno );

@@ -1,9 +1,12 @@
 h2 Registración
 
-form action='/' method='POST'
+.row
+  .col-md-6
 
-  label Correo
-  input type='email' name='correo' required='true'
+    form action='/' method='POST'
 
-  br 
-  input.btn type='submit' value='Siguiente'
+      .input-group
+        label.sr-only Correo
+        input.form-control type='email' name='correo' required='true' placeholder='Correo electrónico'
+        span.input-group-btn
+          button.btn.btn-primary type='submit' Siguiente

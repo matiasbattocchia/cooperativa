@@ -27,12 +27,18 @@ class Usuario
   field :rol
   field :estado, default: 'Habilitado'
 
+  Roles = [
+    'Alumno',
+    'Profesor'
+  ]
+
   Estados = [
     'Habilitado',
     'Desabilitado'
   ]
 
   validates_uniqueness_of :correo
+  validates_inclusion_of :rol, in: Roles
   validates_inclusion_of :estado, in: Estados
 end
 

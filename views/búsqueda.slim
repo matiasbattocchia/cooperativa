@@ -4,27 +4,39 @@
       .modal-header
         button.close type='button' data-dismiss='modal' aria-hidden='true' &times;
         h4.modal-title
-        p#materias
       .modal-body
-        h4 Lugar
-        
-        //.mapa style='width: 140px; height: 140px' data-latitud=lugar.latitud data-longitud=lugar.longitud
-        p#lugar
+        .row
+          .col-md-6
 
-        h4 Horario
+            h4 Materias
+            p#materias
+            
+            h4 Lugar
+            p#lugar
+            //.mapa style='width: 140px; height: 140px' data-latitud=lugar.latitud data-longitud=lugar.longitud
 
-        form action=''
-          label Día
-          input#día.form-control type='text' name='horario[día]' disabled=true
+          .col-md-6
 
-          label Desde
-          input#desde.form-control type='time' name='horario[desde]'
+            h4 Horario
 
-          label Hasta
-          input#hasta.form-control type='time' name='horario[hasta]'
+            form.form-horizontal action='' method='POST'
+              .form-group
+                label.col-md-3.control-label Día
+                .col-md-9
+                  p#día.form-control-static
 
-          input#horarioAlumno type='hidden' name=''
-          input#horarioProfesor type='hidden' name=''
+              .form-group
+                label.col-md-3.control-label Desde
+                .col-md-9
+                  input#desde.form-control type='time' name='horario[desde]'
+
+              .form-group
+                label.col-md-3.control-label Hasta
+                .col-md-9
+                  input#hasta.form-control type='time' name='horario[hasta]'
+
+              input#horarioAlumno type='hidden' name=''
+              input#horarioProfesor type='hidden' name=''
 
       .modal-footer
         button.btn.btn-default type='button' data-dismiss='modal' Cerrar

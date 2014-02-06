@@ -1,29 +1,33 @@
 h2 = 'Zonas para ' + @lugar.nombre
 
-- unless @usuario.zonas.empty?
-  table.table-striped
-    thead
-      tr
-        th
-        th
-    tbody
-      - @usuario.zonas.each do |zona|
-        tr
-          td = zona.nombre
-          td
-            form.link action="/#{@usuario.correo}/zonas/#{zona.id}" method='POST'
-              input type='hidden' name='_method' value='DELETE'
-              input.btn-link type='submit' value='Eliminar'
-- else
-  p Opcional: Agregá zonas que limiten la búsqueda.
+.row
+  .col-md-6
 
-h3 Agregar una zona:
+    form.form-horizontal action='/#{@usuario.correo}/zonas' method='POST'
 
-form.form-horizontal action='/#{@usuario.correo}/zonas' method='POST'
+      input type='hidden' name='lugar_id' value=@lugar.id
+      
+      == slim :localidades
 
-  input type='hidden' name='lugar_id' value=@lugar.id
-  
-  == slim :localidades
+      button.btn.btn-primary.pull-right type='submit' Agregar
 
-  br
-  input.btn.btn-primary type='submit' value='Agregar'
+  .col-md-6.well
+
+    - unless @usuario.zonas.empty?
+      table.table
+        thead
+          tr
+            th Barrio
+            th Localidad
+            th
+        tbody
+          - @usuario.zonas.each do |zona|
+            tr
+              td = zona.localidad.barrio || '-'
+              td = zona.localidad.localidad
+              td
+                form action="/#{@usuario.correo}/zonas/#{zona.id}" method='POST'
+                  input type='hidden' name='_method' value='DELETE'
+                  button.btn-link type='submit' Eliminar
+    - else
+      p Opcional: Agregá zonas que limiten la búsqueda.

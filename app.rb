@@ -137,7 +137,7 @@ post '/' do
 @usuario =
   Usuario.where(correo: params[:correo]).first_or_create
 
-  redirect to "/#{@usuario.correo}/materias"
+  redirect to "/#{@usuario.correo}/datos"
 end
 
 
@@ -326,13 +326,14 @@ end
 get '/:correo/agenda' do
   @usuario = Usuario.find_by(correo: params[:correo])
 
-  - Horario::Días.each do |día|
-    @usuario.horarios.where(día: día).each do |horario|
+  @segmentos = @usuario.horarios
+  # Horario::Días.each do |día|
+  #   @usuario.horarios.where(día: día).each do |horario|
       
       
-      @segmentos = []  
-    end
-  end
+  #     @segmentos = []  
+  #   end
+  # end
 
   slim :agenda
 end

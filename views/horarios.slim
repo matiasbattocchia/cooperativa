@@ -1,48 +1,61 @@
 h2 = 'Horarios para ' + @lugar.nombre
 
-- unless @lugar.horarios.empty?
-  table.table-striped
-    thead
-      tr
-        th Modalidad
-        th Día
-        th Desde
-        th Hasta
-        th
-    tbody
-      - @lugar.horarios.each do |horario|
-        tr
-          td = horario.modalidad
-          td = horario.día
-          td = horario.desde
-          td = horario.hasta
-          td
-            form.link action="/#{@usuario.correo}/horarios/#{horario.id}" method='POST'
-              input type='hidden' name='_method' value='DELETE'
-              input.btn-link type='submit' value='Eliminar'
-- else
-  p Agregá al menos un segmento horario. Puede ser en cualquier día de la semana desde las 7:00 hasta las 23:00.
+.row
+  .col-md-6
 
-h3 Agregar un horario:
+    form.form-horizontal action='/#{@usuario.correo}/horarios' method='POST'
 
-form.form-horizontal action='/#{@usuario.correo}/horarios' method='POST'
+      input type='hidden' name='lugar_id' value=@lugar.id
 
-  input type='hidden' name='lugar_id' value=@lugar.id
+      .form-group
+        label.control-label.col-md-3 Día
+        .col-md-9
+          select.form-control name='horario[día]'
+            - Horario::Días.each do |día|
+              option value=día = día
 
-  label Día
-  select name='horario[día]'
-    - Horario::Días.each do |día|
-      option value=día = día
+      .form-group
+        label.control-label.col-md-3 Desde
+        .col-md-9
+          input.form-control type='time' name='horario[desde]'
 
-  label Desde
-  input type='time' name='horario[desde]'
+      .form-group
+        label.control-label.col-md-3 Hasta
+        .col-md-9
+          input.form-control type='time' name='horario[hasta]'
 
-  label Hasta
-  input type='time' name='horario[hasta]'
+      .form-group
+        label.control-label.col-md-3 Modalidad
+        .col-md-9
+          - Horario::Modalidades.each do |modalidad|
+            label.radio-inline
+              input type='radio' name='horario[modalidad]' value=modalidad checked=(modalidad == 'En lugar') = modalidad
 
-  label Modalidad
-  - Horario::Modalidades.each do |modalidad|
-    input type='radio' name='horario[modalidad]' value=modalidad = modalidad
-    br
+      button.btn.btn-primary.pull-right type='submit' Agregar
 
-  input.btn.btn-primary type='submit' value='Agregar'
+  .col-md-6.well
+
+    - unless @lugar.horarios.empty?
+      table.table
+        thead
+          tr
+            th Modalidad
+            th Día
+            th Desde
+            th Hasta
+            th
+        tbody
+          - @lugar.horarios.each do |horario|
+            tr
+              td = horario.modalidad
+              td = horario.día
+              td = horario.desde
+              td = horario.hasta
+              td
+                form action="/#{@usuario.correo}/horarios/#{horario.id}" method='POST'
+                  input type='hidden' name='_method' value='DELETE'
+                  button.btn.btn-link type='submit' Eliminar
+    - else
+      p Agregá al menos un segmento horario. Puede ser en cualquier día de la semana desde las 7:00 hasta las 23:00.
+
+

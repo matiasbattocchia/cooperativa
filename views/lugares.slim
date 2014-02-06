@@ -19,8 +19,8 @@ h2 Lugares y Horarios
     form.form-horizontal action='/#{@usuario.correo}/lugares' method='POST'
 
       .form-group
-        label.col-md-2.control-label Tipo
-        .col-md-10
+        label.col-md-3.control-label Tipo
+        .col-md-9
           select.form-control name='lugar[tipo]'
             - Lugar::Tipos.each do |tipo|
               option value=tipo = tipo
@@ -58,20 +58,18 @@ h2 Lugares y Horarios
             th
             th
             th
-            th
-            th
         tbody
           - @usuario.lugares.each do |lugar|
             tr
               td.mapa style='width: 140px; height: 140px' data-latitud=lugar.latitud data-longitud=lugar.longitud
               td = lugar.nombre
               td
-                a href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/horarios" Horarios
-              td
-                a href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/zonas" Zonas
-              td
+                a.btn.btn-link href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/horarios" Horarios
+                
+                a.btn.btn-link href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/zonas" Zonas
+                
                 form.link action="/#{@usuario.correo}/lugares/#{lugar.id}" method='POST'
                   input type='hidden' name='_method' value='DELETE'
-                  input.btn-link type='submit' value='Eliminar'
+                  button.btn.btn-link type='submit' Eliminar
     - else
       p Agregá al menos un lugar.

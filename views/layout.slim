@@ -31,9 +31,9 @@ html
             a href="/#{params[:correo]}/lugares" Lugares y Horarios
           li class=('active' if request.path_info =~ /agenda/)
             a href="/#{params[:correo]}/agenda" Agenda
-          - if @usuario.rol == 'Alumno'
-            li class=('active' if request.path_info =~ /b%C3%BAsqueda/)
-              a href="/#{params[:correo]}/búsqueda" Búsqueda
+          //- if @usuario.rol == 'Alumno'
+          li class=('active' if request.path_info =~ /b%C3%BAsqueda/)
+            a href="/#{params[:correo]}/búsqueda" Búsqueda
 
       - if flash[:message]
         div.alert.alert-success = flash[:message]

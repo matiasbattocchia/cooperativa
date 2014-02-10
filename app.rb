@@ -6,6 +6,7 @@ require 'rack-flash'
 require __dir__ + '/modelos.rb'
 
 set :bind, '0.0.0.0'
+set :server, :puma
 
 enable :sessions
 use Rack::Flash

@@ -1,5 +1,37 @@
 //var ac = new usig.AutoCompleter('dirección');
 
+function cambiarBarrio() {
+
+  $( '#barrio' ).empty();
+
+  $.ajax({
+    url: '/localidades',
+    data: {
+      criteria: {
+        nivel_1: $( '#provincia' ).val(),
+        localidad: $( '#localidad' ).val()
+      },
+      nivel: 'barrio'
+    },
+    success: function( data ) {
+
+      $.each(data, function( index, value ) {
+
+        $( '#barrio' ).append( '<option value="' + value + '">' + value + '</option>' );
+
+      });
+
+      if(data.size < 2) {
+        
+        $( '#barrio' ) 'disabled'
+      
+      } else {
+
+      }
+    }
+  });
+}
+
 $( '#provincia' ).change(function() {
 
   $( '#localidad' ).empty();
@@ -19,57 +51,19 @@ $( '#provincia' ).change(function() {
         $( '#localidad' ).append( '<option value="' + value + '">' + value + '</option>' );
 
       });
-    }
-  });
-
-
-  $( '#barrio' ).empty();
-
-  $.ajax({
-    url: '/localidades',
-    data: {
-      criteria: {
-        nivel_1: $( '#provincia' ).val(),
-        localidad: $( '#localidad' ).val()
-      },
-      nivel: 'barrio'
-    },
-    success: function( data ) {
-
-      $.each(data, function( index, value ) {
-
-        $( '#barrio' ).append( '<option value="' + value + '">' + value + '</option>' );
-
-      });
+    
+      cambiarBarrio(); 
+    
     }
   });
 });
 
 
 $( '#localidad' ).change(
-function() {
 
-  $( '#barrio' ).empty();
+  cambiarBarrio
 
-  $.ajax({
-    url: '/localidades',
-    data: {
-      criteria: {
-        nivel_1: $( '#provincia' ).val(),
-        localidad: $( '#localidad' ).val()
-      },
-      nivel: 'barrio'
-    },
-    success: function( data ) {
-
-      $.each(data, function( index, value ) {
-
-        $( '#barrio' ).append( '<option value="' + value + '">' + value + '</option>' );
-
-      });
-    }
-  });
-});
+);
 
 
 function initialize() {

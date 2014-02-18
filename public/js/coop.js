@@ -14,20 +14,22 @@ function cambiarBarrio() {
       nivel: 'barrio'
     },
     success: function( data ) {
+      
+      if(data.length < 2) {
+
+        $( '#barrio' ).prop('disabled', true);
+      
+      } else {
+
+        $( '#barrio' ).prop('disabled', false);
+
+      }
 
       $.each(data, function( index, value ) {
 
         $( '#barrio' ).append( '<option value="' + value + '">' + value + '</option>' );
 
       });
-
-      if(data.size < 2) {
-        
-        $( '#barrio' ) 'disabled'
-      
-      } else {
-
-      }
     }
   });
 }
@@ -45,6 +47,16 @@ $( '#provincia' ).change(function() {
       nivel: 'localidad'
     },
     success: function( data ) {
+
+      if(data.length < 2) {
+        
+        $( '#localidad' ).prop('disabled', true);
+      
+      } else {
+        
+        $( '#localidad' ).prop('disabled', false);
+
+      }
 
       $.each( data, function( index, value ) {
 

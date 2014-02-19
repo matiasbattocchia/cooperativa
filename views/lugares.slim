@@ -55,24 +55,20 @@ h2 Lugares y Horarios
       .panel.panel-default
         .panel-heading Mis lugares
         .panel-body Agregá al menos un lugar.
-        table.table
-          /* thead */
-          /*   tr */
-          /*     th */
-          /*     th */
-          /*     th */
+        table.table.table-mapa
           tbody
             - @usuario.lugares.each do |lugar|
               tr
-                td rowspan=2
+                td.td-mapa rowspan=2
                   .mapa data-latitud=lugar.latitud data-longitud=lugar.longitud
-                td = lugar.nombre
+                td
+                  p = lugar.nombre
               tr
                 td
                   a.btn.btn-link href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/horarios" Horarios
                   
                   a.btn.btn-link href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/zonas" Zonas
                   
-                  form.form-table-b action="/#{@usuario.correo}/lugares/#{lugar.id}" method='POST'
+                  form action="/#{@usuario.correo}/lugares/#{lugar.id}" method='POST'
                     input type='hidden' name='_method' value='DELETE'
                     button.btn.btn-link type='submit' Eliminar

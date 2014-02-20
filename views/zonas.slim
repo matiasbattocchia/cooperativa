@@ -1,6 +1,10 @@
 h2 = @lugar.nombre
 
 ul.nav.nav-tabs
+  li
+    a href="/#{params[:correo]}/lugares"
+      span.glyphicon.glyphicon-arrow-left
+      |  Volver
   li class=('active' if request.path_info =~ /horarios/)
     a href="/#{params[:correo]}/lugares/#{params[:lugar_nombre]}/horarios" Horarios
   li class=('active' if request.path_info =~ /zonas/)
@@ -17,23 +21,31 @@ ul.nav.nav-tabs
 
       button.btn.btn-primary.pull-right type='submit' Agregar
 
-  .col-md-6.well
+  .col-md-6
 
-    - unless @usuario.zonas.empty?
-      table.table
-        thead
-          tr
-            th Barrio
-            th Localidad
-            th
-        tbody
-          - @usuario.zonas.each do |zona|
+    .panel.panel-primary
+      .panel-heading
+        h3.panel-title Zonas seleccionadas
+      
+      .panel-body
+        p
+          | Agregá zonas para limitar la búsqueda de clases a las cuales ir desde este lugar.
+          |  La búsqueda es por cercanía, no siempre es necesario delimitarla.
+          |  Si no te vas a mover de este lugar, las zonas son irrelevantes.
+
+      - unless @lugar.zonas.empty?
+        table.table
+          thead
             tr
-              td = zona.localidad.barrio || '-'
-              td = zona.localidad.localidad
-              td
-                form.form-table action="/#{@usuario.correo}/zonas/#{zona.id}" method='POST'
-                  input type='hidden' name='_method' value='DELETE'
-                  button.btn.btn-link.btn-table-link type='submit' Eliminar
-    - else
-      p Opcional: Agregá zonas que limiten la búsqueda.
+              th Barrio
+              th Localidad
+              th
+          tbody
+            - @usuario.zonas.each do |zona|
+              tr
+                td = zona.localidad.barrio || '-'
+                td = zona.localidad.localidad
+                td
+                  form.form-table action="/#{@usuario.correo}/zonas/#{zona.id}" method='POST'
+                    input type='hidden' name='_method' value='DELETE'
+                    button.btn.btn-link.btn-table-link type='submit' Eliminar

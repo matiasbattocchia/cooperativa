@@ -1,6 +1,10 @@
 h2 = @lugar.nombre
 
 ul.nav.nav-tabs
+  li
+    a href="/#{params[:correo]}/lugares"
+      span.glyphicon.glyphicon-arrow-left
+      |  Volver
   li class=('active' if request.path_info =~ /horarios/)
     a href="/#{params[:correo]}/lugares/#{params[:lugar_nombre]}/horarios" Horarios
   li class=('active' if request.path_info =~ /zonas/)
@@ -23,12 +27,12 @@ ul.nav.nav-tabs
       .form-group
         label.control-label.col-md-3 Desde
         .col-md-9
-          input.form-control type='time' name='horario[desde]'
+          input.form-control type='text' name='horario[desde]'
 
       .form-group
         label.control-label.col-md-3 Hasta
         .col-md-9
-          input.form-control type='time' name='horario[hasta]'
+          input.form-control type='text' name='horario[hasta]'
 
       .form-group
         label.control-label.col-md-3 Modalidad
@@ -36,6 +40,10 @@ ul.nav.nav-tabs
           - Horario::Modalidades.each do |modalidad|
             label.radio-inline
               input type='radio' name='horario[modalidad]' value=modalidad checked=(modalidad == 'En lugar') = modalidad
+          span.help-block
+            | Marcá <b>en lugar</b> para indicar un horario en el que puedas tener una
+            | clase en esta ubicación, o bien <b>desde lugar</b> para ir a una
+            | clase desde esta ubicación.
 
       button.btn.btn-primary.pull-right type='submit' Agregar
 

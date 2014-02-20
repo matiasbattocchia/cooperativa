@@ -34,7 +34,7 @@ function cambiarBarrio() {
   });
 }
 
-$( '#provincia' ).change(function() {
+$( '#provincia' ).change( function() {
 
   $( '#localidad' ).empty();
 
@@ -78,6 +78,22 @@ $( '#localidad' ).change(
 );
 
 
+$( '#tipo' ).change( function() {
+  
+  var tipo = $( '#tipo' ).val()
+
+  if( tipo == 'Biblioteca' || tipo == 'Facultad' ) {
+
+    $( '#establecimiento' ).show();
+
+  } else {
+    
+    $( '#establecimiento' ).hide();
+  
+  }
+});
+
+
 function initialize() {
   $( '.mapa' ).each( function( indice, direccion ) {
 
@@ -110,7 +126,7 @@ function initialize() {
 
 // window.onload = loadScript;
 
-$(document).on("click", ".abrir-modalPedido", function () {
+$(document).on("click", ".abrir-modalPedido", function() {
   var profesor = $(this).data('profesor');
   var materias = $(this).data('materias');
   var lugar = $(this).data('lugar');

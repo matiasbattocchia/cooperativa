@@ -21,7 +21,7 @@ h2 Lugares y Horarios
       .form-group
         label.col-md-3.control-label Tipo
         .col-md-9
-          select.form-control name='lugar[tipo]'
+          select.form-control#tipo name='lugar[tipo]'
             - Lugar::Tipos.each do |tipo|
               option value=tipo = tipo
 
@@ -40,10 +40,14 @@ h2 Lugares y Horarios
         .col-md-3
           input.form-control type='text' name='lugar[timbre]' placeholder='Timbre'
 
-      .form-group
+      .form-group#establecimiento hidden=true
         label.sr-only Establecimiento
         .col-md-12
           input.form-control type='text' name='lugar[establecimiento]' placeholder='Establecimiento'
+          span.help-block
+            | Este campo es opcional, útil para buscar lugares de público conocimiento
+            |  (ejemplo: "Biblioteca Nacional") sin tener que especificar la dirección, aun así
+            |  localidad y barrio deben estar bien elegidos.
 
       .form-group
         .col-md-12
@@ -51,24 +55,34 @@ h2 Lugares y Horarios
 
   .col-md-6
 
-    - unless @usuario.lugares.empty?
-      .panel.panel-default
-        .panel-heading Mis lugares
-        .panel-body Agregá al menos un lugar.
-        table.table.table-mapa
-          tbody
-            - @usuario.lugares.each do |lugar|
-              tr
-                td.td-mapa rowspan=2
-                  .mapa data-latitud=lugar.latitud data-longitud=lugar.longitud
-                td
-                  p = lugar.nombre
-              tr
-                td
-                  a.btn.btn-link href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/horarios" Horarios
-                  
-                  a.btn.btn-link href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/zonas" Zonas
-                  
-                  form action="/#{@usuario.correo}/lugares/#{lugar.id}" method='POST'
-                    input type='hidden' name='_method' value='DELETE'
-                    button.btn.btn-link type='submit' Eliminar
+    .panel.panel-primary
+      .panel-heading
+        h3.panel-title Lugares cargados
+      
+      .panel-body
+        p
+          - if @usuario.lugares.empty?
+            | Agregá al menos un lugar <b>en</b> el que puedas <b>tener una clase</b>
+            |  o <b>desde</b> el que puedas <b>ir a una clase</b> (buscaremos clases
+            |  cercanas al lugar).
+          - else
+            | Especificá los <b>horarios</b> en los que estás disponible para
+            |  cada lugar, y si lo ves conveniente, restringí las <b>zonas</b> a
+            |  las cuales llegás desde cada lugar.
+    
+      table.table
+        tbody
+          - @usuario.lugares.each do |lugar|
+            tr
+              td.td-mapa-1 rowspan=2
+                .mapa data-latitud=lugar.latitud data-longitud=lugar.longitud
+              td.td-mapa-2 = lugar.nombre
+            tr
+              td.td-mapa-3
+                a.btn.btn-link href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/horarios" Horarios
+                
+                a.btn.btn-link href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/zonas" Zonas
+                
+                form.form-mapa action="/#{@usuario.correo}/lugares/#{lugar.id}" method='POST'
+                  input type='hidden' name='_method' value='DELETE'
+                  button.btn.btn-link type='submit' Eliminar

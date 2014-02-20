@@ -8,16 +8,24 @@
   height: 20px;
 }
 
-.form-table-b {
-  display: inline-block;
-}
-
 .nav {
   margin-bottom: 20px;
 }
 
-.td-mapa {
+.table .td-mapa-1 {
   width: 157px;
+}
+
+.table .td-mapa-3 {
+  border: 0;
+}
+
+.table .td-mapa-2 {
+  font-size: 20px;
+}
+
+.table .form-mapa {
+  display: inline-block;
 }
 
 .mapa {
@@ -25,3 +33,7 @@
   height: 140px;
 }
 
+.gmnoprint,
+.gmnoscreen {
+  display: none;      
+}

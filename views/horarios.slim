@@ -18,58 +18,63 @@ ul.nav.nav-tabs
       input type='hidden' name='lugar_id' value=@lugar.id
 
       .form-group
-        label.control-label.col-md-3 Día
+        label.control-label.col-md-3 Días
         .col-md-9
-          select.form-control name='horario[día]'
-            - Horario::Días.each do |día|
-              option value=día = día
+          - Horario::Días.each do |día|
+            label.checkbox-inline
+              input type='checkbox' name='horario[días][]' value=día = día
 
       .form-group
         label.control-label.col-md-3 Desde
-        .col-md-9
-          input.form-control type='text' name='horario[desde]'
-
+        .col-md-3
+          input.form-control type='text' name='horario[desde]' placeholder='07:00'
+        
       .form-group
         label.control-label.col-md-3 Hasta
-        .col-md-9
-          input.form-control type='text' name='horario[hasta]'
+        .col-md-3
+          input.form-control type='text' name='horario[hasta]' placeholder='23:00'
 
       .form-group
-        label.control-label.col-md-3 Modalidad
+        label.control-label.col-md-3 Modalidades
         .col-md-9
           - Horario::Modalidades.each do |modalidad|
-            label.radio-inline
-              input type='radio' name='horario[modalidad]' value=modalidad checked=(modalidad == 'En lugar') = modalidad
+            label.checkbox-inline
+              input type='checkbox' name='horario[modalidades][]' value=modalidad = modalidad
           span.help-block
-            | Marcá <b>en lugar</b> para indicar un horario en el que puedas tener una
-            | clase en esta ubicación, o bien <b>desde lugar</b> para ir a una
-            | clase desde esta ubicación.
+            | Marcá <b>en lugar</b> para indicar un segmento horario para tener
+            |  clases en esta ubicación, y/o <b>desde lugar</b> para ir a
+            |  clases desde esta ubicación.
 
       button.btn.btn-primary.pull-right type='submit' Agregar
 
-  .col-md-6.well
+  .col-md-6
 
-    - unless @lugar.horarios.empty?
-      table.table
-        thead
-          tr
-            th Modalidad
-            th Día
-            th Desde
-            th Hasta
-            th
-        tbody
-          - @lugar.horarios.each do |horario|
+    .panel.panel-primary
+      .panel-heading
+        h3.panel-title Segmentos horarios
+
+      .panel-body
+        p
+          | Agregá segmentos horarios en los que estarás disponible.
+          |  Pueden ser en cualquier día de la semana desde las 7:00 hasta las 23:00.
+
+      - unless @lugar.horarios.empty?
+        table.table
+          thead
             tr
-              td = horario.modalidad
-              td = horario.día
-              td = horario.desde
-              td = horario.hasta
-              td
-                form.form-table action="/#{@usuario.correo}/horarios/#{horario.id}" method='POST'
-                  input type='hidden' name='_method' value='DELETE'
-                  button.btn.btn-link.btn-table-link type='submit' Eliminar
-    - else
-      p Agregá al menos un segmento horario. Puede ser en cualquier día de la semana desde las 7:00 hasta las 23:00.
-
-
+              th Modalidad
+              th Día
+              th Desde
+              th Hasta
+              th
+          tbody
+            - @lugar.horarios.each do |horario|
+              tr
+                td = horario.modalidad
+                td = horario.día
+                td = horario.desde
+                td = horario.hasta
+                td
+                  form.form-table action="/#{@usuario.correo}/horarios/#{horario.id}" method='POST'
+                    input type='hidden' name='_method' value='DELETE'
+                    button.btn.btn-link.btn-table-link type='submit' Eliminar

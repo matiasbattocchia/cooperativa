@@ -33,6 +33,14 @@
   height: 140px;
 }
 
+.checkbox-inline {
+  margin-right: 10px;
+}
+
+.checkbox-inline + .checkbox-inline {
+  margin-left: 0;
+}
+
 .gmnoprint,
 .gmnoscreen {
   display: none;      

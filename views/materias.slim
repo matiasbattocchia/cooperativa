@@ -19,8 +19,7 @@ form action='/#{@usuario.correo}/materias' method='POST'
 
       .form-group  
         - @materias.where(nivel: 'CBC').each do |materia|
-          .checkbox
-            label
+          label.checkbox
               input type='checkbox' name='materias[]' value=materia.id checked=materia.usuarios.find(@usuario) = materia.nombre
 
       button.btn.btn-primary.pull-right type='submit' Aceptar

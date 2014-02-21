@@ -274,7 +274,7 @@ post '/:correo/zonas' do
     @usuario.zonas << zona
   end
 
-  redirect to "/#{@usuario.correo}/lugares/#{zona.lugar.nombre.gsub(' ', '_')}/zonas"
+  redirect to "/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/zonas"
 end
 
 
@@ -303,13 +303,22 @@ post '/:correo/horarios' do
  
   if lugar = @usuario.lugares.find(params[:lugar_id])
 
-    horario = Horario.new(params[:horario])
-    horario.lugar = lugar
+    params[:horario][:días].each do |día|
+      params[:horario][:modalidades].each do |modalidad|
 
-    @usuario.horarios << horario
+        horario = Horario.new(params[:horario])
+        horario.lugar = lugar
+        horario.día = día
+        horario.desde = params[:horario][:desde]
+        horario.hasta = params[:horario][:hasta]
+        horario.modalidad = modalidad
+
+        @usuario.horarios << horario
+      end
+    end
   end
   
-  redirect to "/#{@usuario.correo}/lugares/#{horario.lugar.nombre.gsub(' ', '_')}/horarios"
+  redirect to "/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/horarios"
 end
 
 

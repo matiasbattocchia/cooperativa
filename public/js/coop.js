@@ -6,8 +6,18 @@ $( '.tiempo' ).datetimepicker({
   maxTime: '23:01',
   step: 30,
   timepickerScrollbar: false,
+  scrollInput: false,
 });
 
+$( '.fecha' ).datetimepicker({
+  timepicker: false,
+  todayButton: false,
+  lang: 'es',
+  format: 'd/m/Y',
+  scrollInput: false,
+  dayOfWeekStart: 1,
+  minDate: 0,
+});
 
 function cambiarBarrio() {
 

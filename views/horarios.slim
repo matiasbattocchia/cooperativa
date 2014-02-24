@@ -22,7 +22,7 @@ ul.nav.nav-tabs
         .col-md-9
           - Horario::Días.each do |día|
             .checkbox-dia
-              label = día[0,2]
+              label = día[0,3]
               input type='checkbox' name='horario[días][]' value=día
 
       .form-group
@@ -36,7 +36,7 @@ ul.nav.nav-tabs
           input.form-control.tiempo type='text' name='horario[hasta]' placeholder='––:––'
 
       .form-group
-        label.control-label.col-md-3 Modos
+        label.control-label.col-md-3 Modalidades
         .col-md-9
           - Horario::Modalidades.each do |modalidad|
             label.checkbox-inline

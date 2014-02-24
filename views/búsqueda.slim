@@ -48,6 +48,30 @@
 
 h2 Búsqueda (#{materias.join(', ')})
 
+
+form method='' action='POST'
+  .row
+    .col-md-4
+      .row
+        .col-md-6
+          .form-group
+            label.control-label Desde
+            input.fecha.form-control type='text' value=Time.now.strftime('%d/%m/%Y')
+        
+        .col-md-6
+          .form-group
+            label.control-label Hasta
+            input.fecha.form-control type='text' value=Time.now.strftime('%d/%m/%Y')
+      
+      span.help-block Indicá el periodo en el que necesitarás...
+
+    .col-md-2
+      .form-group-btn-busqueda
+        button.btn.btn-primary.btn-block type='submit' Buscar
+
+
+
+
 table.table
   thead
     tr
@@ -67,6 +91,6 @@ table.table
         - lugar = opcion[:horario_alumno].modalidad == 'En lugar' ? opcion[:horario_alumno].lugar.nombre : opcion[:horario_profesor].lugar.nombre + ', ' + opcion[:horario_profesor].lugar.localidad.nombre + ' (%.2f km)' % opcion[:distancia]
         td = lugar
         td = opcion[:horario_alumno].día
-        td #{opcion[:desde]} a #{opcion[:hasta]} (#{opcion[:tiempo] / 60} horas #{opcion[:tiempo] % 60} minutos)
+        td #{opcion[:desde]} a #{opcion[:hasta]} (#{opcion[:tiempo] / 60}h #{opcion[:tiempo] % 60}m)
         td
           a.abrir-modalPedido data-toggle='modal' data-target='#modalPedido' data-profesor=opcion[:profesor].nombre data-materias=materias_en_común data-día=opcion[:horario_alumno].día data-desde=opcion[:desde] data-hasta=opcion[:hasta] data-horario_profesor=opcion[:horario_profesor].id data-horario_alumno=opcion[:horario_alumno].id data-lugar=lugar Pedir

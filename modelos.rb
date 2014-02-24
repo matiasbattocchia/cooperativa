@@ -16,7 +16,7 @@ class Usuario
   include Mongoid::Document
 
   has_and_belongs_to_many :materias
-  has_many :lugares
+  has_many :lugares, dependent: :destroy
   has_many :zonas
   has_many :horarios
 
@@ -57,8 +57,8 @@ end
 class Localidad
   include Mongoid::Document
 
-  has_many :lugares
-  has_many :zonas
+  has_many :lugares, dependent: :restrict
+  has_many :zonas, dependent: :restrict
 
   field :barrio
   field :comuna
@@ -78,8 +78,8 @@ class Lugar
 
   belongs_to :usuario
   belongs_to :localidad
-  has_many :zonas
-  has_many :horarios
+  has_many :zonas, dependent: :destroy
+  has_many :horarios, dependent: :destroy
 
   field :establecimiento
   field :calle

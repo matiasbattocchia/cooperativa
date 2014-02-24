@@ -1,0 +1,3 @@
+[submodule "public/datetimepicker"]
+	path = public/datetimepicker
+	url = https://github.com/xdan/datetimepicker

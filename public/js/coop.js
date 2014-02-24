@@ -1,4 +1,13 @@
 //var ac = new usig.AutoCompleter('dirección');
+$( '.tiempo' ).datetimepicker({
+  datepicker: false,
+  format: 'H:i',
+  minTime: '7:00',
+  maxTime: '23:01',
+  step: 30,
+  timepickerScrollbar: false,
+});
+
 
 function cambiarBarrio() {
 
@@ -84,11 +93,11 @@ $( '#tipo' ).change( function() {
 
   if( tipo == 'Biblioteca' || tipo == 'Facultad' ) {
 
-    $( '#establecimiento' ).show();
+    $( '#establecimiento' ).slideDown('slow');
 
   } else {
     
-    $( '#establecimiento' ).hide();
+    $( '#establecimiento' ).slideUp('slow');
   
   }
 });

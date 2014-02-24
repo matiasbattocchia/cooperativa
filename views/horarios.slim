@@ -18,24 +18,25 @@ ul.nav.nav-tabs
       input type='hidden' name='lugar_id' value=@lugar.id
 
       .form-group
-        label.control-label.col-md-3 Días
+        label.control-label.label-dia.col-md-3 Días
         .col-md-9
           - Horario::Días.each do |día|
-            label.checkbox-inline
-              input type='checkbox' name='horario[días][]' value=día = día
+            .checkbox-dia
+              label = día[0,2]
+              input type='checkbox' name='horario[días][]' value=día
 
       .form-group
         label.control-label.col-md-3 Desde
-        .col-md-3
-          input.form-control type='text' name='horario[desde]' placeholder='07:00'
+        .col-md-9
+          input.form-control.tiempo type='text' name='horario[desde]' placeholder='––:––'
         
       .form-group
         label.control-label.col-md-3 Hasta
-        .col-md-3
-          input.form-control type='text' name='horario[hasta]' placeholder='23:00'
+        .col-md-9
+          input.form-control.tiempo type='text' name='horario[hasta]' placeholder='––:––'
 
       .form-group
-        label.control-label.col-md-3 Modalidades
+        label.control-label.col-md-3 Modos
         .col-md-9
           - Horario::Modalidades.each do |modalidad|
             label.checkbox-inline
@@ -55,7 +56,7 @@ ul.nav.nav-tabs
 
       .panel-body
         p
-          | Agregá segmentos horarios en los que estarás disponible.
+          | Agregá segmentos horarios de al menos 1 hora de duración en los que estarás disponible.
           |  Pueden ser en cualquier día de la semana desde las 7:00 hasta las 23:00.
 
       - unless @lugar.horarios.empty?

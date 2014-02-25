@@ -144,14 +144,14 @@ end
 
 ### DATOS ###
 
-get '/:correo/datos' do
+get '/:correo/perfil' do
   @usuario = Usuario.find_by(correo: params[:correo])
 
-  slim :datos
+  slim :perfil
 end
 
 
-post '/:correo/datos' do
+post '/:correo/perfil' do
   @usuario = Usuario.find_by(correo: params[:correo])
 
   @usuario.update_attributes(params[:datos])
@@ -165,7 +165,7 @@ post '/:correo/datos' do
     end
     @usuario.save
   else
-    redirect to "/#{@usuario.correo}/datos"
+    redirect to "/#{@usuario.correo}/perfil"
   end
 end
 

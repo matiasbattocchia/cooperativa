@@ -1,3 +1,12 @@
+.content-header {
+  margin-top: 0;
+}
+
+.form-group-btn-busqueda {
+  margin-top: 25px;
+  margin-bottom: 15px;
+}
+
 .checkbox-dia {
   margin-right: 20px;
   display: inline-block;
@@ -45,7 +54,7 @@
 }
 
 .nav {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .table .td-mapa-1 {

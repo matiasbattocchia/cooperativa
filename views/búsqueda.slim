@@ -46,30 +46,34 @@
 
 - materias = @alumno.materias.map(&:nombre)
 
-h2 Búsqueda (#{materias.join(', ')})
+/h2 Búsqueda
+/(#{materias.join(', ')})
 
-
-form method='' action='POST'
-  .row
-    .col-md-4
-      .row
-        .col-md-6
-          .form-group
-            label.control-label Desde
-            input.fecha.form-control type='text' value=Time.now.strftime('%d/%m/%Y')
+.row
+  .col-md-6
+    form.form-horizontal method='' action='POST'
+      .form-group
+        label.col-md-3.control-label Desde
+        .col-md-9
+          input.fecha.form-control type='text' value=(@alumno.búsqueda_desde || Time.now.strftime('%d/%m/%Y'))
         
-        .col-md-6
-          .form-group
-            label.control-label Hasta
-            input.fecha.form-control type='text' value=Time.now.strftime('%d/%m/%Y')
+      .form-group
+        label.col-md-3.control-label Hasta
+        .col-md-9
+          input.fecha.form-control type='text' value=(@alumno.búsqueda_hasta || Time.now.strftime('%d/%m/%Y'))
       
-      span.help-block Indicá el periodo en el que necesitarás...
-
-    .col-md-2
-      .form-group-btn-busqueda
-        button.btn.btn-primary.btn-block type='submit' Buscar
+      button.btn.btn-primary.pull-right type='submit' Buscar
 
 
+  .col-md-6
+
+    .panel.panel-primary
+      .panel-heading
+        h3.panel-title Zonas
+      
+      .panel-body
+        p
+          | Agregá zonas para limitar la búsqueda de clases a las cuales ir desde este lugar.
 
 
 table.table

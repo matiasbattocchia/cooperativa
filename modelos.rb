@@ -27,6 +27,9 @@ class Usuario
   field :rol
   field :estado, default: 'Habilitado'
 
+  field :búsqueda_desde
+  field :búsqueda_hasta
+
   Roles = [
     'Alumno',
     'Profesor'

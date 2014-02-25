@@ -1,20 +1,22 @@
-h2 Lugares y Horarios
+/h2 Lugares y Horarios
 
 .row
   .col-md-6
 
-    h3 Lugar precargado
+    h3.content-header Lugar precargado
     
     form action='/#{@usuario.correo}/lugares' method='POST'
 
-      .input-group
-        select.form-control name='lugar_precargado_id'
-          - Lugar.where(usuario: nil).asc(:nombre).each do |lugar|
-            option value=lugar.id = lugar.nombre
-        span.input-group-btn
-          button.btn.btn-primary type='submit' name='lugar_precargado' Agregar
+      .form-group
+        .input-group
+          select.form-control name='lugar_precargado_id'
+            - Lugar.where(usuario: nil).asc(:nombre).each do |lugar|
+              option value=lugar.id = lugar.nombre
+          
+          span.input-group-btn
+            button.btn.btn-primary type='submit' name='lugar_precargado' Agregar
       
-    h3 Lugar nuevo
+    h3.content-header Lugar nuevo
     
     form.form-horizontal action='/#{@usuario.correo}/lugares' method='POST'
 
@@ -49,15 +51,13 @@ h2 Lugares y Horarios
             |  (ejemplo: "Biblioteca Nacional") sin tener que especificar la dirección, aun así
             |  localidad y barrio deben estar bien elegidos.
 
-      .form-group
-        .col-md-12
-          button.btn.btn-primary.pull-right type='submit' Agregar
+      button.btn.btn-primary.pull-right type='submit' Agregar
 
   .col-md-6
 
     .panel.panel-primary
       .panel-heading
-        h3.panel-title Lugares cargados
+        h3.panel-title Lugares
       
       .panel-body
         p

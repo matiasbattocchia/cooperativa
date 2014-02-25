@@ -24,8 +24,8 @@ html
 
       - unless request.path_info == '/'
         ul.nav.nav-pills
-          li class=('active' if request.path_info =~ /datos/)
-            a href="/#{params[:correo]}/datos" Datos
+          li class=('active' if request.path_info =~ /perfil/)
+            a href="/#{params[:correo]}/perfil" Perfil
           li class=('active' if request.path_info =~ /materias/)
             a href="/#{params[:correo]}/materias" Materias
           li class=('active' if request.path_info =~ /lugares/)

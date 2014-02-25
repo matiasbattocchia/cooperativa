@@ -52,13 +52,17 @@ end
 
 ### Alumnos y Profesores ###
 
-get '/profesores' do
+get '/:correo/profesores' do
+  @usuario = Usuario.find_by(correo: params[:correo])
+  
   @profesores = Usuario.where(rol: 'Profesor')
 
   slim :lista
 end
 
-get '/alumnos' do
+get '/:correo/alumnos' do
+  @usuario = Usuario.find_by(correo: params[:correo])
+  
   @profesores = Usuario.where(rol: 'Alumno')
 
   slim :lista

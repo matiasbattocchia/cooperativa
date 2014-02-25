@@ -12,6 +12,7 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.irregular('horario', 'horarios')
 end
 
+
 class Usuario
   include Mongoid::Document
 
@@ -27,8 +28,42 @@ class Usuario
   field :rol
   field :estado, default: 'Habilitado'
 
-  field :búsqueda_desde
-  field :búsqueda_hasta
+  field :búsqueda_desde, type: Time
+  field :búsqueda_hasta, type: Time
+
+
+  def búsqueda_desde
+    fecha = read_attribute(:búsqueda_desde)
+
+    fecha = if fecha
+              fecha > Time.now ? fecha : Time.now
+            else
+              Time.now
+            end
+
+    fecha.strftime('%d/%m/%Y')
+  end
+
+  def búsqueda_desde=(fecha)
+    write_attribute(:búsqueda_desde, Time.new(*fecha.split('/').reverse))
+  end
+
+  def búsqueda_hasta
+    fecha = read_attribute(:búsqueda_hasta)
+
+    fecha = if fecha
+              fecha > Time.now ? fecha : Time.now
+            else
+              Time.now
+            end
+
+    fecha.strftime('%d/%m/%Y')
+  end
+  
+  def búsqueda_hasta=(fecha)
+    write_attribute(:búsqueda_hasta, Time.new(*fecha.split('/').reverse))
+  end
+
 
   Roles = [
     'Alumno',

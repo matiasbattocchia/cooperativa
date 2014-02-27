@@ -23,9 +23,10 @@
       .form-group
         label.control-label.col-md-3 Rol
         .col-md-9
-          - Usuario::Roles.each do |rol|
-            label.radio-inline
-              input type='radio' name='datos[rol]' value=rol checked=((rol == 'Alumno' && @usuario.rol == nil) || @usuario.rol == rol) = rol
+          .btn-group.btn-group-justified data-toggle='buttons'
+            - Usuario::Roles.each do |rol|
+              label.btn.btn-default class=('active' if (rol == 'Alumno' && @usuario.rol == nil) || @usuario.rol == rol)
+                input type='radio' name='datos[rol]' value=rol = rol
 
       //- if @usuario.estado == 'Habilitado'
       //  input.btn.btn-danger type='submit' name='estado' value='Deshabilitar'

@@ -132,9 +132,8 @@ class Lugar
 
   Tipos = [
     'Domicilio',
-    'Café',
-    'Facultad',
-    'Biblioteca'
+    'Comercio',
+    'Institución'
   ]
 
   validates_inclusion_of :tipo, in: Tipos

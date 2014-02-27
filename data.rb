@@ -82,13 +82,18 @@ lugares_precargados = [
   {localidad:
      {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '13',  barrio: 'Núñez'},
    lugar:
-     {establecimiento: 'Ciudad Universitaria', tipo: 'Facultad', longitud: -58.4410214, latitud: -34.5430098}
+     {establecimiento: 'Ciudad Universitaria', tipo: 'Institución', longitud: -58.4410214, latitud: -34.5430098}
+  },
+  {localidad:
+     {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '1', barrio: 'Constitución'},
+   lugar:
+     {establecimiento: 'Sociales (Sede Constitución)', calle: 'Santiago del Estero', altura: '1029', tipo: 'Institución', longitud: -58.38439499999999, latitud: -34.6204528}
   },
   {localidad:
      {nivel_1: 'Ciudad Autónoma de Buenos Aires', localidad: 'Buenos Aires', comuna: '2', barrio: 'Recoleta'},
    lugar:
-     {establecimiento: 'Sociales (Sede Recoleta)', calle: 'Marcelo T. de Alvear', altura: '2230', tipo: 'Facultad', longitud: -58.3992804, latitud: -34.5969861}
-  }
+     {establecimiento: 'Sociales (Sede Recoleta)', calle: 'Marcelo T. de Alvear', altura: '2230', tipo: 'Institución', longitud: -58.3992804, latitud: -34.5969861}
+  },
 ]
 
 if Materia.empty?

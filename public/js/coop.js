@@ -97,11 +97,9 @@ $( '#localidad' ).change(
 );
 
 
-$( '#tipo' ).change( function() {
-  
-  var tipo = $( '#tipo' ).val()
+$( "input[name='lugar[tipo]']:radio" ).change( function() {
 
-  if( tipo == 'Biblioteca' || tipo == 'Facultad' ) {
+  if( $( "input[name='lugar[tipo]'][value='Institución']:radio" )[0].checked ) {
 
     $( '#establecimiento' ).slideDown('slow');
 

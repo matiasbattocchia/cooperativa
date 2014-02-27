@@ -51,17 +51,23 @@
 
 .row
   .col-md-6
-    form method='/#{@usuario.correo}/búsqueda/buscar' action='POST'
+    form action='/#{@alumno.correo}/búsqueda' method='POST'
       .row
         .col-md-6
           .form-group
             label.control-label Desde
-            input.fecha.form-control type='text' value=@alumno.búsqueda_desde
+            .input-group
+              span.input-group-addon
+                span.glyphicon.glyphicon-calendar
+              input.fecha.form-control type='text' name='fechas[búsqueda_desde]' value=@alumno.búsqueda_desde
         
         .col-md-6
           .form-group
             label.control-label Hasta
-            input.fecha.form-control type='text' value=@alumno.búsqueda_hasta
+            .input-group
+              span.input-group-addon
+                span.glyphicon.glyphicon-calendar
+              input.fecha.form-control type='text' name='fechas[búsqueda_hasta]' value=@alumno.búsqueda_hasta
       
       button.btn.btn-primary.pull-right type='submit' Buscar
 
@@ -74,20 +80,31 @@
         p
           | Indicá el periodo en el que necesitarás clases. Priorizaremos
           |  a los profesores con mayor disponibilidad horaria dentro de
-          |  ese periodo.
+          |  ese periodo. Intentaremos que el mismo profesor dé todas las
+          |  materias que necesitás.
 
 
 table.table
   tbody
-    - @opciones.each do |opcion|
+    - @profesores.each do |profesor|
       tr
-        td
-          a href="/#{opcion[:profesor].correo}/datos" = opcion[:profesor].nombre
-        - materias_en_común = (opcion[:profesor].materias.map(&:nombre) & materias).join(', ')
-        td = materias_en_común
-        - lugar = opcion[:horario_alumno].modalidad == 'En lugar' ? opcion[:horario_alumno].lugar.nombre : opcion[:horario_profesor].lugar.nombre + ', ' + opcion[:horario_profesor].lugar.localidad.nombre + ' (%.2f km)' % opcion[:distancia]
-        td = lugar
-        td = opcion[:horario_alumno].día
-        td #{opcion[:desde]} a #{opcion[:hasta]} (#{opcion[:tiempo] / 60}h #{opcion[:tiempo] % 60}m)
-        td
-          a.abrir-modalPedido data-toggle='modal' data-target='#modalPedido' data-profesor=opcion[:profesor].nombre data-materias=materias_en_común data-día=opcion[:horario_alumno].día data-desde=opcion[:desde] data-hasta=opcion[:hasta] data-horario_profesor=opcion[:horario_profesor].id data-horario_alumno=opcion[:horario_alumno].id data-lugar=lugar Pedir
+        td = profesor.nombre
+        td = profesor.materias
+        td = profesor.disponibilidad
+        td = profesor.cercanía
+        td = profesor.próxima_clase
+
+/* table.table */
+/*   tbody */
+/*     - @opciones.each do |opcion| */
+/*       tr */
+/*         td */
+/*           a href="/#{opcion[:profesor].correo}/datos" = opcion[:profesor].nombre */
+/*         - materias_en_común = (opcion[:profesor].materias.map(&:nombre) & materias).join(', ') */
+/*         td = materias_en_común */
+/*         - lugar = opcion[:horario_alumno].modalidad == 'En lugar' ? opcion[:horario_alumno].lugar.nombre : opcion[:horario_profesor].lugar.nombre + ', ' + opcion[:horario_profesor].lugar.localidad.nombre + ' (%.2f km)' % opcion[:distancia] */
+/*         td = lugar */
+/*         td = opcion[:horario_alumno].día */
+/*         td #{opcion[:desde]} a #{opcion[:hasta]} (#{opcion[:tiempo] / 60}h #{opcion[:tiempo] % 60}m) */
+/*         td */
+/*           a.abrir-modalPedido data-toggle='modal' data-target='#modalPedido' data-profesor=opcion[:profesor].nombre data-materias=materias_en_común data-día=opcion[:horario_alumno].día data-desde=opcion[:desde] data-hasta=opcion[:hasta] data-horario_profesor=opcion[:horario_profesor].id data-horario_alumno=opcion[:horario_alumno].id data-lugar=lugar Pedir */

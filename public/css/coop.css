@@ -61,13 +61,22 @@
   width: 157px;
 }
 
-.table .td-mapa-3 {
-  border: 0;
-}
-
 .table .td-mapa-2 {
   font-size: 20px;
   height: 44px;
+}
+
+.table .td-mapa-3 {
+  color: grey;
+  font-size: 18px;
+  height: 38px;
+  padding-left: 20px;
+  padding-top: 4px;
+  border: 0;
+}
+
+.table .td-mapa-4 {
+  border: 0;
 }
 
 .table .form-mapa {

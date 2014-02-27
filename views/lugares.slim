@@ -23,9 +23,12 @@
       .form-group
         label.col-md-3.control-label Tipo
         .col-md-9
-          select.form-control#tipo name='lugar[tipo]'
+          .btn-group.btn-group-justified data-toggle='buttons'
             - Lugar::Tipos.each do |tipo|
-              option value=tipo = tipo
+              label.btn.btn-default
+                input type='radio' name='lugar[tipo]' value=tipo = tipo 
+          span.help-block
+            | Ej.: <b>comercio</b>, café; <b>institución</b>, facultad, biblioteca. 
 
       == slim :localidades
 
@@ -47,8 +50,8 @@
         .col-md-12
           input.form-control type='text' name='lugar[establecimiento]' placeholder='Establecimiento'
           span.help-block
-            | Este campo es opcional, útil para buscar lugares de público conocimiento
-            |  (ejemplo: "Biblioteca Nacional") sin tener que especificar la dirección, aun así
+            | Este campo es opcional, sirve para añadir una institución por su nombre
+            |  sin tener que especificar su dirección, aun así
             |  localidad y barrio deben estar bien elegidos.
 
       button.btn.btn-primary.pull-right type='submit' Agregar
@@ -74,11 +77,13 @@
         tbody
           - @usuario.lugares.each do |lugar|
             tr
-              td.td-mapa-1 rowspan=2
+              td.td-mapa-1 rowspan=3
                 .mapa data-latitud=lugar.latitud data-longitud=lugar.longitud
               td.td-mapa-2 = lugar.nombre
             tr
-              td.td-mapa-3
+              td.td-mapa-3 = lugar.tipo
+            tr
+              td.td-mapa-4
                 a.btn.btn-link href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/horarios" Horarios
                 
                 a.btn.btn-link href="/#{@usuario.correo}/lugares/#{lugar.nombre.gsub(' ', '_')}/zonas" Zonas

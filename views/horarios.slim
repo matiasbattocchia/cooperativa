@@ -18,29 +18,36 @@ ul.nav.nav-tabs
       input type='hidden' name='lugar_id' value=@lugar.id
 
       .form-group
-        label.control-label.label-dia.col-md-3 Días
+        label.control-label.col-md-3 Días
         .col-md-9
-          - Horario::Días.each do |día|
-            .checkbox-dia
-              label = día[0,3]
-              input type='checkbox' name='horario[días][]' value=día
+          .btn-group.btn-group-justified data-toggle='buttons'
+            - Horario::Días.each do |día|
+              label.btn.btn-default
+                input type='checkbox' name='horario[días][]' value=día = día[0,3]
 
       .form-group
         label.control-label.col-md-3 Desde
         .col-md-9
-          input.form-control.tiempo type='text' name='horario[desde]' placeholder='––:––'
+          .input-group
+            span.input-group-addon
+              span.glyphicon.glyphicon-time
+            input.form-control.tiempo type='text' name='horario[desde]' placeholder='––:––'
         
       .form-group
         label.control-label.col-md-3 Hasta
         .col-md-9
-          input.form-control.tiempo type='text' name='horario[hasta]' placeholder='––:––'
+          .input-group
+            span.input-group-addon
+              span.glyphicon.glyphicon-time
+            input.form-control.tiempo type='text' name='horario[hasta]' placeholder='––:––'
 
       .form-group
         label.control-label.col-md-3 Modalidades
         .col-md-9
-          - Horario::Modalidades.each do |modalidad|
-            label.checkbox-inline
-              input type='checkbox' name='horario[modalidades][]' value=modalidad = modalidad
+          .btn-group.btn-group-justified data-toggle='buttons'
+            - Horario::Modalidades.each do |modalidad|
+              label.btn.btn-default
+                input type='checkbox' name='horario[modalidades][]' value=modalidad = modalidad
           span.help-block
             | Marcá <b>en lugar</b> para indicar un segmento horario para tener
             |  clases en esta ubicación, y/o <b>desde lugar</b> para ir a

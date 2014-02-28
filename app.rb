@@ -124,7 +124,7 @@ get '/:correo/búsqueda' do
                   horario_profesor.lugar.tipo != 'Domicilio' &&
                   horario_alumno.lugar.tipo != 'Domicilio' &&
                   distancia < 0.01) ||
-                 horario_profesor.modalidad != horario_alumno.modalidad
+                  horario_profesor.modalidad != horario_alumno.modalidad
                 
                 @profesores[profesor.id] << {profesor: profesor, horario_profesor: horario_profesor, horario_alumno: horario_alumno, desde: hora_desde, hasta: hora_hasta, distancia: distancia, tiempo: tiempo}
               end
@@ -326,7 +326,6 @@ post '/:correo/horarios' do
     params[:horario][:días].each do |día|
       params[:horario][:modalidades].each do |modalidad|
 
-        horario = Horario.new(params[:horario])
         horario.lugar = lugar
         horario.día = día
         horario.desde = params[:horario][:desde]

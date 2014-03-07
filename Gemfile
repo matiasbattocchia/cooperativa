@@ -11,6 +11,7 @@ gem 'mongoid', '~> 3.1.2'
 gem 'haversine_distance'
 gem 'rack-flash3', github: 'treeder/rack-flash'
 gem 'binding_of_caller'
+gem 'tod'
 
 group :development do
   gem 'better_errors'

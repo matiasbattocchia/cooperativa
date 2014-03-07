@@ -13,7 +13,7 @@ form action='/#{@usuario.correo}/materias' method='POST'
             - @materias.where(nivel: 'Secundario').each do |materia|
               .checkbox
                 label
-                  input type='checkbox' name='materias[]' value=materia.id checked=materia.usuarios.find(@usuario) = materia.nombre
+                  input type='checkbox' name='materias[]' value=materia.id checked=@usuario.materias.find(materia) = materia.nombre
 
         .col-md-5
 
@@ -23,6 +23,6 @@ form action='/#{@usuario.correo}/materias' method='POST'
             - @materias.where(nivel: 'CBC').each do |materia|
               .checkbox
                 label
-                  input type='checkbox' name='materias[]' value=materia.id checked=materia.usuarios.find(@usuario) = materia.nombre
+                  input type='checkbox' name='materias[]' value=materia.id checked=@usuario.materias.find(materia) = materia.nombre
 
       button.btn.btn-primary.pull-right type='submit' Aceptar

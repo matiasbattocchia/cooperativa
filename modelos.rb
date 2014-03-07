@@ -1,4 +1,5 @@
 require 'mongoid'
+require 'tod/time_of_day'
 
 Mongoid.load!('mongoid.yml')
 Mongoid.raise_not_found_error = false
@@ -21,7 +22,7 @@ class Usuario
   has_many :lugares, dependent: :destroy
   has_many :zonas
   has_many :horarios
-  has_many :eventos
+  has_many :eventos, dependent: :destroy
 
   field :nombre
   field :correo
@@ -86,7 +87,7 @@ end
 class Materia
   include Mongoid::Document
 
-  has_and_belongs_to_many :usuarios
+  # has_and_belongs_to_many :usuarios
 
   field :nombre
   field :nivel
@@ -179,8 +180,8 @@ class Horario
   belongs_to :lugar
 
   field :día
-  field :desde
-  field :hasta
+  field :desde, type: TimeOfDay
+  field :hasta, type: TimeOfDay
 
   field :modalidad
 

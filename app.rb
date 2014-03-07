@@ -98,37 +98,39 @@ get '/:correo/búsqueda' do
   if params[:materias]
 
     profesores.each do |profesor|
-      profesor.horarios.each do |horario_profesor|
-        @alumno.horarios.each do |horario_alumno|
-          if (día = horario_profesor.día) == horario_alumno.día
-            hora_desde =
-              horario_profesor.desde.en_minutos <
-                horario_alumno.desde.en_minutos ?
-                  horario_alumno.desde : horario_profesor.desde
-            
-            hora_hasta =
-              horario_profesor.hasta.en_minutos <
-                horario_alumno.hasta.en_minutos ?
-                  horario_profesor.hasta : horario_alumno.hasta
-            
-            if (tiempo = hora_hasta.en_minutos - hora_desde.en_minutos) >= Duración
+      Horario::Días.each do |día|
+        profesor.horarios.where(día: día).each do |horario_profesor|
+          @alumno.horarios.where(día: día).each do |horario_alumno|
+            # if (día = horario_profesor.día) == horario_alumno.día
+              hora_desde =
+                horario_profesor.desde.en_minutos <
+                  horario_alumno.desde.en_minutos ?
+                    horario_alumno.desde : horario_profesor.desde
+              
+              hora_hasta =
+                horario_profesor.hasta.en_minutos <
+                  horario_alumno.hasta.en_minutos ?
+                    horario_profesor.hasta : horario_alumno.hasta
+              
+              if (tiempo = hora_hasta.en_minutos - hora_desde.en_minutos) >= Duración
 
-              distancia = Haversine.distance(
-                horario_profesor.lugar.latitud,
-                horario_profesor.lugar.longitud,
-                horario_alumno.lugar.latitud,
-                horario_alumno.lugar.longitud)
+                distancia = Haversine.distance(
+                  horario_profesor.lugar.latitud,
+                  horario_profesor.lugar.longitud,
+                  horario_alumno.lugar.latitud,
+                  horario_alumno.lugar.longitud)
 
-              if (horario_profesor.modalidad == 'En lugar' &&
-                  horario_alumno.modalidad == 'En lugar' &&
-                  horario_profesor.lugar.tipo != 'Domicilio' &&
-                  horario_alumno.lugar.tipo != 'Domicilio' &&
-                  distancia < 0.01) ||
-                  horario_profesor.modalidad != horario_alumno.modalidad
-                
-                @profesores[profesor.id] << {profesor: profesor, horario_profesor: horario_profesor, horario_alumno: horario_alumno, desde: hora_desde, hasta: hora_hasta, distancia: distancia, tiempo: tiempo}
+                if (horario_profesor.modalidad == 'En lugar' &&
+                    horario_alumno.modalidad == 'En lugar' &&
+                    horario_profesor.lugar.tipo != 'Domicilio' &&
+                    horario_alumno.lugar.tipo != 'Domicilio' &&
+                    distancia < 0.01) ||
+                    horario_profesor.modalidad != horario_alumno.modalidad
+                  
+                  @profesores[profesor.id] << {profesor: profesor, horario_profesor: horario_profesor, horario_alumno: horario_alumno, desde: hora_desde, hasta: hora_hasta, distancia: distancia, tiempo: tiempo}
+                end
               end
-            end
+            # end
           end
         end
       end

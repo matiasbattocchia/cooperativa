@@ -1,16 +1,83 @@
-/h2 Agenda
+/* /h2 Agenda */
 
-.row
-  - Horario::Días.each do |día|
-    .col-md-1
-      table
-        thead
-          tr
-            th = día
-        tbody
-          - @segmentos.where(día: día).each do |segmento|
-            tr
-              td class=segmento.modalidad #{segmento.desde} a #{segmento.hasta}
+/* .row */
+/*   - Horario::Días.each do |día| */
+/*     .col-md-1 */
+/*       table */
+/*         thead */
+/*           tr */
+/*             th = día */
+/*         tbody */
+/*           - @segmentos.where(día: día).each do |segmento| */
+/*             tr */
+/*               td class=segmento.modalidad #{segmento.desde} a #{segmento.hasta} */
 
-form
+/* form */
   
+.row
+  .col-md-6
+
+    form.form-horizontal action='/#{@usuario.correo}/agenda' method='POST'
+
+      .form-group
+        label.control-label.col-md-3 Desde
+        .col-md-9
+          .row
+            .col-md-6
+              .input-group
+                span.input-group-addon
+                  span.glyphicon.glyphicon-calendar
+                input.form-control.fecha type='text' name='evento[fecha_desde]' placeholder='––/––/––––'
+ 
+            .col-md-6
+              .input-group
+                span.input-group-addon
+                  span.glyphicon.glyphicon-time
+                input.form-control.tiempo type='text' name='evento[hora_desde]' placeholder='––:––'
+        
+      .form-group
+        label.control-label.col-md-3 Hasta
+        .col-md-9
+          .row
+            .col-md-6
+              .input-group
+                span.input-group-addon
+                  span.glyphicon.glyphicon-calendar
+                input.form-control.fecha type='text' name='evento[fecha_hasta]' placeholder='––/––/––––'
+              
+            .col-md-6
+              .input-group
+                span.input-group-addon
+                  span.glyphicon.glyphicon-time
+                input.form-control.tiempo type='text' name='evento[hora_hasta]' placeholder='––:––'
+
+      button.btn.btn-primary.pull-right type='submit' Agregar
+
+  .col-md-6
+
+    .panel.panel-primary
+      .panel-heading
+        h3.panel-title Eventos
+
+      .panel-body
+        p
+          | Los eventos se imponen a tu rutina, permitiendo
+          |  indicar momentos en los que no estarás disponible
+          |  para tener clases.
+
+      - unless @eventos.empty?
+        table.table
+          thead
+            tr
+              th Desde
+              th Hasta
+              th
+          tbody
+            - @eventos.each do |evento|
+              tr
+                td = evento.desde
+                td = evento.hasta
+                td
+                  form.form-table action="/#{@usuario.correo}/eventos/#{evento.id}" method='POST'
+                    input type='hidden' name='_method' value='DELETE'
+                    button.btn.btn-link.btn-table-link type='submit' Eliminar

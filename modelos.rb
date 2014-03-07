@@ -10,6 +10,7 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.irregular('lugar', 'lugares')
   inflect.irregular('zona', 'zonas')
   inflect.irregular('horario', 'horarios')
+  inflect.irregular('evento', 'eventos')
 end
 
 
@@ -20,6 +21,7 @@ class Usuario
   has_many :lugares, dependent: :destroy
   has_many :zonas
   has_many :horarios
+  has_many :eventos
 
   field :nombre
   field :correo
@@ -172,10 +174,10 @@ end
 
 class Horario
   include Mongoid::Document
-  
+
   belongs_to :usuario
   belongs_to :lugar
-  
+
   field :día
   field :desde
   field :hasta
@@ -199,6 +201,24 @@ class Horario
 
   validates_inclusion_of :día, in: Días
   validates_inclusion_of :modalidad, in: Modalidades
+end
+
+
+class Evento
+  include Mongoid::Document
+
+  belongs_to :usuario
+
+  field :desde, type: Time
+  field :hasta, type: Time
+  field :tipo
+
+  Tipos = [
+    'Clase',
+    'Otro'
+  ]
+
+  validates_inclusion_of :tipo, in: Tipos
 end
 
 

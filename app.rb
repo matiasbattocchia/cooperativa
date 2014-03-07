@@ -158,7 +158,7 @@ post '/' do
 @usuario =
   Usuario.where(correo: params[:correo]).first_or_create
 
-  redirect to "/#{@usuario.correo}/datos"
+  redirect to "/#{@usuario.correo}/perfil"
 end
 
 
@@ -355,7 +355,8 @@ end
 get '/:correo/agenda' do
   @usuario = Usuario.find_by(correo: params[:correo])
 
-  @segmentos = @usuario.horarios
+  @eventos = @usuario.eventos.where(:desde.gt => Time.now)
+
   # Horario::Días.each do |día|
   #   @usuario.horarios.where(día: día).each do |horario|
       
@@ -365,4 +366,17 @@ get '/:correo/agenda' do
   # end
 
   slim :agenda
+end
+
+post '/:correo/agenda' do
+  @usuario = Usuario.find_by(correo: params[:correo])
+
+  evento = Evento.new
+  evento.desde = Time.new *params[:evento][:fecha_desde].split('/').reverse, *params[:evento][:hora_desde].split(':')
+  evento.hasta = Time.new *params[:evento][:fecha_hasta].split('/').reverse, *params[:evento][:hora_hasta].split(':')
+  evento.tipo = 'Otro'
+
+  @usuario.eventos << evento
+
+  redirect to "/#{@usuario.correo}/agenda"
 end

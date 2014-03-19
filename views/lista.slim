@@ -9,5 +9,5 @@ table.table-striped
     - @profesores.each do |profesor|
       tr
         td
-          a href="/#{profesor.correo}/datos" = profesor.nombre
+          a href="/#{profesor.correo}/perfil" = profesor.nombre
         td = profesor.estado

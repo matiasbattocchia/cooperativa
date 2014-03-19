@@ -81,38 +81,51 @@ class Integer
   end
 end
 
-# Duración mínima de una clase en minutos.
+# Duración mínima de una clase en segundos.
 
-Duración = 90
+DuraciónMínima = 60 * 60
 
 
 ### BÚSQUEDA ###
 
 get '/:correo/búsqueda' do
-  @alumno = Usuario.find_by(correo: params[:correo], rol: 'Alumno')
+  @alumno = Usuario.
+    find_by(correo: params[:correo], rol: 'Alumno')
 
-  profesores = Usuario.where(rol: 'Profesor', estado: 'Habilitado').in(materia_ids: @alumno.materia_ids)
+  profesores = Usuario.
+    where(rol: 'Profesor', estado: 'Habilitado').
+      in(materia_ids: @alumno.materia_ids)
 
   @profesores = Hash.new { |h,k| h[k]=[] }
   
   if params[:materias]
-
     profesores.each do |profesor|
-      Horario::Días.each do |día|
-        profesor.horarios.where(día: día).each do |horario_profesor|
-          @alumno.horarios.where(día: día).each do |horario_alumno|
-            # if (día = horario_profesor.día) == horario_alumno.día
+      día = @alumno.read_attribute(:búsqueda_desde)
+      día_hasta = @alumno.read_attribute(:búsqueda_hasta)
+
+      while día <= día_hasta
+
+        día_de_la_semana = Horario::Días[día.wday - 1]
+
+        profesor.horarios.where(día: día_de_la_semana).
+          each do |horario_profesor|
+
+          @alumno.horarios.where(día: día_de_la_semana).
+            each do |horario_alumno|
+
               hora_desde =
-                horario_profesor.desde.en_minutos <
-                  horario_alumno.desde.en_minutos ?
-                    horario_alumno.desde : horario_profesor.desde
+                horario_profesor.desde <
+                  horario_alumno.desde ?
+                    horario_alumno.desde :
+                      horario_profesor.desde
               
               hora_hasta =
-                horario_profesor.hasta.en_minutos <
-                  horario_alumno.hasta.en_minutos ?
-                    horario_profesor.hasta : horario_alumno.hasta
+                horario_profesor.hasta <
+                  horario_alumno.hasta ?
+                    horario_profesor.hasta :
+                      horario_alumno.hasta
               
-              if (tiempo = hora_hasta.en_minutos - hora_desde.en_minutos) >= Duración
+              if (duración = hora_hasta - hora_desde) >= DuraciónMínima
 
                 distancia = Haversine.distance(
                   horario_profesor.lugar.latitud,
@@ -127,12 +140,15 @@ get '/:correo/búsqueda' do
                     distancia < 0.01) ||
                     horario_profesor.modalidad != horario_alumno.modalidad
                   
-                  @profesores[profesor.id] << {profesor: profesor, horario_profesor: horario_profesor, horario_alumno: horario_alumno, desde: hora_desde, hasta: hora_hasta, distancia: distancia, tiempo: tiempo}
+                  días[desde] << {horario_profesor: horario_profesor, horario_alumno: horario_alumno, desde: hora_desde, hasta: hora_hasta, distancia: distancia, tiempo: tiempo}
+                  # @profesores[profesor.id] << {profesor: profesor, horario_profesor: horario_profesor, horario_alumno: horario_alumno, desde: hora_desde, hasta: hora_hasta, distancia: distancia, tiempo: tiempo}
                 end
               end
             # end
           end
         end
+
+        desde += 86400
       end
     end
   end
